@@ -1,0 +1,38 @@
+url: "https://tastycode.dev" # the base hostname & protocol for your site, e.g. http://example.com
+baseurl: "/" # the subpath of your site, e.g. /blog
+title: "TastyCode"
+
+defaults:
+  - scope:
+      path: ""
+      type: "posts"
+    values:
+      permalink: /blog/:title:output_ext
+
+include:
+  - .nojekyll
+
+exclude:
+  - Makefile
+  - package.json
+  - postcss.config.js
+  - tailwind.config.js
+  - yarn.lock
+
+markdown: kramdown
+kramdown:
+  input: GFM
+  syntax_highlighter: rouge
+
+plugins:
+  - jekyll-feed
+  #  For Tailwind install, see https://mzrn.sh/2022/04/09/starting-a-blank-jekyll-site-with-tailwind-css-in-2022/
+  - jekyll-postcss
+  - jekyll-sitemap
+
+postcss:
+  cache: false
+
+#  Template variables
+my:
+  date_format: "%Y-%m-%d"

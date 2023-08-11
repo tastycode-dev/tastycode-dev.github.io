@@ -1,0 +1,12 @@
+{
+  "scripts": {
+    "deploy": "gh-pages -d _site --dotfiles"
+  },
+  "devDependencies": {
+    "autoprefixer": "^10.4.14",
+    "cssnano": "^6.0.1",
+    "gh-pages": "^6.0.0",
+    "postcss": "^8.4.27",
+    "tailwindcss": "^3.3.3"
+  }
+}

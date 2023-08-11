@@ -1,0 +1,129 @@
+---
+---
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html {
+    font-family: Arial, sans-serif;
+    font-size: 18px;
+  }
+
+  a {
+    @apply no-underline;
+    @apply underline-offset-2;
+    @apply hover:underline;
+
+    color: blue;
+  }
+
+  address {
+    font-style: normal;
+  }
+
+  .content {
+    background-color: theme("colors.neutral.100");
+    @apply pb-1 min-h-screen px-12;
+  }
+
+  body {
+    background-color: theme("colors.neutral.200");
+    font-family: Lato, sans-serif;
+
+    color: theme("colors.neutral.800");
+
+    margin: auto;
+    /*  80 ch + article.padding */
+    max-width: 86ch;
+
+    @apply px-8;
+  }
+
+  figure {
+    @apply pb-8;
+  }
+
+  h1 {
+    @apply bg-white font-bold mb-5 mt-2 px-3 py-3 text-3xl text-center tracking-tight;
+    @apply border-2 border-black border-solid;
+    box-shadow: 0.5rem 0.5rem black;
+  }
+
+  h2 {
+    @apply text-2xl pt-3 pb-2;
+    color: blue;
+  }
+
+  h3 {
+    @apply text-xl pt-2 pb-2;
+    color: blue;
+  }
+
+  header {
+    @apply pb-6;
+  }
+
+  html {
+    font-size: 18px;
+  }
+
+  li {
+    @apply pb-2 ms-8;
+  }
+
+  ol {
+    @apply list-decimal list-outside mb-4;
+  }
+
+  p {
+    @apply leading-relaxed mb-4 mt-0;
+  }
+
+  pre {
+    @apply bg-white border-neutral-400 border-solid mb-4 px-4 py-2 whitespace-pre-wrap;
+    border-width: 1px;
+  }
+
+  table {
+    @apply mb-4 m-auto;
+  }
+
+  table td,
+  th,
+  tr {
+    @apply align-top border border-neutral-300 p-1 text-center;
+  }
+
+  th {
+    @apply bg-neutral-200 px-4;
+  }
+
+  tr {
+    @apply bg-white px-4;
+  }
+
+  ul {
+    @apply list-disc list-outside mb-4;
+  }
+
+  @media (max-width: 768px) {
+    article {
+      @apply min-h-screen px-6;
+    }
+
+    body {
+      @apply px-0;
+    }
+
+    html {
+      font-size: 14px;
+    }
+  }
+
+  /* Leading Paragraph */
+  .article-body > p:first-child {
+    @apply leading-relaxed mt-0 mb-8 text-lg text-stone-800;
+  }
+}
