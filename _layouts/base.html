@@ -2,38 +2,8 @@
 <html lang="en-US">
 
 <head>
-  {%- if page.title -%}
-  <title> {{ page.title }} | {{ site.title }}</title>
-  {%- else -%}
-  <title> {{ site.title }}</title>
-  {%- endif -%}
-
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="author" content="Oleksandr Gituliar">
-  {%- if page.description -%}
-  <meta name="description" content="{{ page.description }}">
-  {%- endif -%}
-
-  <script type="application/ld+json">
-    {
-      "@context" : "https://schema.org",
-      "@type" : "WebSite",
-      "name" : "TastyCode",
-      "alternateName": ["tastycode.dev"],
-      "url" : "https://tastycode.dev/"
-    }
-  </script>
-
-  {%- if page.date -%}
-  <script type="application/ld+json">
-    {
-      "@context": "https://schema.org",
-      "@type": "BlogPosting",
-      "datePublished": "{{ page.date }}",
-    }
-  </script>
-  {%- endif -%}
 
   {%- if jekyll.environment == 'production' -%}
   <!-- Google tag (gtag.js) -->
@@ -50,6 +20,8 @@
   <link rel="stylesheet" href="{{ '/static/css/main.css' | relative_url }}">
   <link rel="stylesheet" href="/static/css/code.css">
   <link rel="icon" href="/favicon.ico">
+
+  {% seo %}
 </head>
 
 <body>
