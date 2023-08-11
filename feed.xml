@@ -1,0 +1,234 @@
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="4.3.2">Jekyll</generator><link href="http://localhost:4000/feed.xml" rel="self" type="application/atom+xml" /><link href="http://localhost:4000/" rel="alternate" type="text/html" /><updated>2023-08-11T14:03:30+02:00</updated><id>http://localhost:4000/feed.xml</id><title type="html">TastyCode</title><entry><title type="html">Tasty C++ – Memory Layout of std::string</title><link href="http://localhost:4000/blog/tasty-cpp-memory-layout-of-std-string.html" rel="alternate" type="text/html" title="Tasty C++ – Memory Layout of std::string" /><published>2023-08-07T00:00:00+02:00</published><updated>2023-08-07T00:00:00+02:00</updated><id>http://localhost:4000/blog/tasty-cpp-memory-layout-of-std-string</id><content type="html" xml:base="http://localhost:4000/blog/tasty-cpp-memory-layout-of-std-string.html"><![CDATA[<p>For a professional C++ developer, it’s important to understand memory organization of the data
+structures, especially when working with containers from the C++ Standard Library. In this post of
+Tasty C++ series we’ll look inside of <code class="language-plaintext highlighter-rouge">std::string</code>, so that you can more effectively work with C++
+strings and take advantage (or avoid pitfalls) of the C++ Standard Library implementation you are
+currently using.</p>
+
+<p>In C++ Standard Library, <code class="language-plaintext highlighter-rouge">std::string</code> is one of the three <a href="https://en.cppreference.com/w/cpp/named_req/ContiguousContainer">contiguous
+containers</a> (the other two are
+<code class="language-plaintext highlighter-rouge">std::array</code> and <code class="language-plaintext highlighter-rouge">std::vector</code>). This means that a sequence of characters is stored in a
+<em>contiguous</em> area of the memory and an individual character can be efficiently accessed by its index
+at O(1) time. The C++ Standard imposes more requirements on the complexity of string operations,
+which we will briefly focus on later this post.</p>
+
+<p>What is important to remember is that the C++ Standard doesn’t impose exact implementation of
+<code class="language-plaintext highlighter-rouge">std::string</code>, nor does it specify how much memory should it allocate. In practice, as we’ll see,
+the most popular implementations of the C++ Standard Library allocate various amount of memory for
+the same <code class="language-plaintext highlighter-rouge">std::string</code> object, so that the result of <code class="language-plaintext highlighter-rouge">sizeof(std::string)</code> might be <code class="language-plaintext highlighter-rouge">24</code> or <code class="language-plaintext highlighter-rouge">32</code>
+bytes.</p>
+
+<h2 id="long-strings">Long Strings</h2>
+
+<p>Usually, to fully represent its internal state, <code class="language-plaintext highlighter-rouge">std::string</code> needs three pieces of information:</p>
+
+<ul>
+  <li><strong>Size</strong> – the current number of characters in the string.</li>
+  <li><strong>Buffer</strong> – the pointer to the memory buffer where characters are stored.</li>
+  <li><strong>Capacity</strong> – the max number of character the buffer can fit.</li>
+</ul>
+
+<p>In fact, the <em>capacity</em> is not required. We can use <em>size</em> and <em>buffer</em> only, but when the string
+grows, a new buffer should be allocated on the heap (because we can’t tell how many extra characters
+the current buffer can fit). Since heap allocation is slow, such allocations are avoided by tracking
+the buffer capacity.</p>
+
+<p>Following this logic, we could implement a C++ string as:</p>
+
+<div class="language-cpp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">class</span> <span class="nc">TastyString</span> <span class="p">{</span>
+    <span class="kt">size_t</span>    <span class="n">m_size</span><span class="p">;</span>
+    <span class="kt">char</span> <span class="o">*</span>    <span class="n">m_buffer</span><span class="p">;</span>
+    <span class="kt">size_t</span>    <span class="n">m_capacity</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p><code class="language-plaintext highlighter-rouge">MyString</code> occupies 24 bytes, which is only 3x more than <strong>fundamental types</strong> such as <code class="language-plaintext highlighter-rouge">void *</code>,
+<code class="language-plaintext highlighter-rouge">size_t</code>, or <code class="language-plaintext highlighter-rouge">double</code>.</p>
+
+<p>Let’s see how things look in reality. In the <em>most popular implementations</em> of the C++ Standard
+Library the size of <code class="language-plaintext highlighter-rouge">std::string</code> object is the following:</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>C++ Standard Library</th>
+      <th>Size of std::string()</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>MSVC STL</td>
+      <td>32 bytes</td>
+    </tr>
+    <tr>
+      <td>GCC libstdc++</td>
+      <td>32 bytes</td>
+    </tr>
+    <tr>
+      <td>LLVM libc++</td>
+      <td>24 bytes</td>
+    </tr>
+  </tbody>
+</table>
+
+<p>To our surprise, only <strong>LLVM</strong> allocates expected <strong>24 bytes</strong> for <code class="language-plaintext highlighter-rouge">std::string</code>. The other two,
+<strong>MSVC</strong> and <strong>GCC</strong>, allocate <strong>32 bytes</strong> for the same string. (For completeness, note that in the
+<em>debug mode</em> MSVC allocates 40 bytes for <code class="language-plaintext highlighter-rouge">std::string</code>.)</p>
+
+<h2 id="short-strings">Short Strings</h2>
+
+<p>Let’s get some intuition about why various implementation allocate different amount of memory for
+the same object. In fact, 24 or 32 bytes is already enough to fit a relatively big string, with no
+need to allocate dynamic memory (and free it afterwards, which is costly as well). The trick, called
+<strong>Small String Optimization</strong> (aka SSO), is to store string characters in the memory dedicated for
+the size, capacity, and data pointer fields. Not sure this technique is part of the C++ Standard,
+but for sure it’s popular among various implementations.</p>
+
+<p>Without going into much technicalities of SSO, let’s mention two points worth to remember.</p>
+
+<p><strong>How big are short strings?</strong> It seems obvious that every implementation is free to extend
+internal buffer for a small string far beyond required 24 bytes. This is why <code class="language-plaintext highlighter-rouge">std::string</code> in
+MSVC and GCC is 32 bytes. However, the result of <strong><code class="language-plaintext highlighter-rouge">std::string().capacity()</code></strong> is:</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>C++ Standard Library</th>
+      <th>Capacity of std::string()</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>MSVC STL</td>
+      <td>15 chars</td>
+    </tr>
+    <tr>
+      <td>GCC libstdc++</td>
+      <td>15 chars</td>
+    </tr>
+    <tr>
+      <td>LLVM libc++</td>
+      <td>22 chars</td>
+    </tr>
+  </tbody>
+</table>
+
+<p>Again, LLVM version seems to beat MSVC and GCC, since for a smaller memory usage (24 bytes) it’s
+able to store longer strings (22 chars). (In fact, it’s possible to fully utilize the memory and
+fit 23 chars + <code class="language-plaintext highlighter-rouge">'\0'</code>.)</p>
+
+<p><strong>How fast are short strings?</strong> In this particular case, utilizing more space is not for
+free. The more characters we pack into a string’s memory area, the more CPU operations we have to
+run. For LLVM, with its superior memory efficiency, even such a simple call as <code class="language-plaintext highlighter-rouge">size()</code> requires
+to check if the string is short or long. This sort of conditions might slow down a calculation
+pipeline.</p>
+
+<p>A simple example of <code class="language-plaintext highlighter-rouge">size()</code> method clearly demonstrates this point. (BTW, this is one of
+the most commonly used method of <code class="language-plaintext highlighter-rouge">std::string</code>.)</p>
+
+<p><strong>GCC stdlibc++</strong> code (see https://godbolt.org/z/7nYe9rWdE) directly copies string’s size into
+the output register:</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>Example</th>
+      <th>GCC libstdc++</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><img src="/static/img/string-size-src.png" alt="string size C++ code" /></td>
+      <td><img src="/static/img/string-size-gcc.png" alt="string size GCC assembler" /></td>
+    </tr>
+  </tbody>
+</table>
+
+<p><strong>LLVM libc++</strong> code (see https://godbolt.org/z/xM349cG5P) at first checks if the string is short
+and then calculates its size.</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>Example</th>
+      <th>LLVM libc++</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><img src="/static/img/string-size-src.png" alt="string size C++ code" /></td>
+      <td><img src="/static/img/string-size-llvm.png" alt="string size LLVM assembler" /></td>
+    </tr>
+  </tbody>
+</table>
+
+<p>Eventually, it’s hard to say which approach is more efficient. Now, that you know the difference,
+the best advice here is to experiment with various implementations and benchmark your particular use
+case.</p>
+
+<h2 id="memory-allocation-policy">Memory Allocation Policy</h2>
+
+<p>Finally, let’s see how <code class="language-plaintext highlighter-rouge">std::string</code> grows its internal buffer when it’s time to allocate more
+memory. Some <a href="https://github.com/gcc-mirror/gcc/blob/master/libstdc%2B%2B-v3/include/bits/basic_string.tcc#L142">comments in the GCC
+sources</a>,
+mentioned <em>amortized linear time requirement</em> and <em>exponential growth policy</em>. Not clear if this is
+internal GCC decision or part of the C++ Standard. In any case, all three implementations use
+exponential growth, so that <strong>MSVC</strong> has <strong>1.5x factor</strong> growth, while <strong>GCC</strong> and <strong>LLVM</strong> use <strong>2x
+factor</strong>. Below are some examples with more explicit (but simplified) code:</p>
+
+<p><strong>MSVC STL</strong></p>
+
+<div class="language-cpp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kt">size_t</span> <span class="nf">newCapacity</span><span class="p">(</span><span class="kt">size_t</span> <span class="n">newSize</span><span class="p">,</span> <span class="kt">size_t</span> <span class="n">oldCap</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="n">max</span><span class="p">(</span><span class="n">newSize</span><span class="p">,</span> <span class="n">oldCap</span> <span class="o">+</span> <span class="n">oldCap</span> <span class="o">/</span> <span class="mi">2</span><span class="p">);</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>Example: 15, 31, 47, 70, 105, 157, 235, 352, 528, 792, 1’188, 1’782, 2’673, 4’009.</p>
+
+<p><strong>GCC libstdc++</strong></p>
+
+<div class="language-cpp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kt">size_t</span> <span class="nf">newCapacity</span><span class="p">(</span><span class="kt">size_t</span> <span class="n">newSize</span><span class="p">,</span> <span class="kt">size_t</span> <span class="n">oldCap</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="n">max</span><span class="p">(</span><span class="n">newSize</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">oldCap</span><span class="p">);</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>Example: 15, 30, 60, 120, 240, 480, 960, 1’920, 3’840, 7’680, 15’360, 30’720.</p>
+
+<p><strong>LLVM libc++</strong></p>
+
+<div class="language-cpp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kt">size_t</span> <span class="nf">newCapacity</span><span class="p">(</span><span class="kt">size_t</span> <span class="n">newSize</span><span class="p">,</span> <span class="kt">size_t</span> <span class="n">oldCap</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="n">max</span><span class="p">(</span><span class="n">newSize</span><span class="p">,</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">oldCap</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>Example: 22, 47, 95, 191, 383, 767, 1’535, 3’071, 6’143, 12’287, 24’575, 49’151.</p>
+
+<h2 id="summary">Summary</h2>
+
+<p>Because the C++ Standard doesn’t provide specific implementation details for <code class="language-plaintext highlighter-rouge">std::string</code>, there
+are a couple of tradeoffs for the developer of the C++ Standard Library to consider:</p>
+
+<ul>
+  <li><strong>Size</strong>: <em>24 bytes</em> (LLVM) vs <em>32 bytes</em> (GCC, MSVC)</li>
+  <li><strong>Capacity</strong>: <em>15 chars + Simple Code</em> (GCC, MSVC) vs <em>22 chars + Complex Code</em> (LLVM)</li>
+  <li><strong>Growth Policy</strong>: Exponential with <em>1.5x factor</em> (MSVC) vs <em>2x factor</em> (GCC, LLVM)</li>
+</ul>
+
+<p>In some cases they might be the nice features provided directly by the C++ Standard Library. In
+other situations they might be the limitations, which require extra attention from your side or even
+completely new implementation.</p>
+
+<p>Hopefully, these details will make you a better programmer, help write more efficient C++ code, and
+design better data structures.</p>
+
+<p><strong>Recommended Links:</strong></p>
+
+<ul>
+  <li>“libc++’s implementation of std::string” by Joel Laity:<br />
+<a href="https://joellaity.com/2020/01/31/string.html">https://joellaity.com/2020/01/31/string.html</a><br />
+Discussion on Hacker News:<br />
+<a href="https://news.ycombinator.com/item?id=22198158">https://news.ycombinator.com/item?id=22198158</a></li>
+  <li>CppCon 2016: “The strange details of std::string at Facebook” by Nicholas Ormrod:<br />
+<a href="https://www.youtube.com/watch?v=kPR8h4-qZdk">https://www.youtube.com/watch?v=kPR8h4-qZdk</a></li>
+</ul>
+
+<p>TastyCode by Oleksandr Gituliar.</p>]]></content><author><name>Oleksandr Gituliar</name></author><summary type="html"><![CDATA[Learn about memory layout of std::string in c++ standard libraries: MSVC STL, libstdc++, libc++.]]></summary></entry></feed>
