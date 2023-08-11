@@ -1,11 +1,15 @@
+.PHONY: serve build deploy install
+
 serve:
 	jekyll serve
-eploy:
+
+build:
+	JEKYLL_ENV=production jekyll build
+
+deploy: build
 	yarn deploy
 
 
 install:
 	bundle install
-
-install-tailwind:
 	yarn add postcss@latest tailwindcss@latest autoprefixer@latest cssnano@latest -D
