@@ -1,12 +1,12 @@
 .PHONY: serve build deploy install
 
 serve:
-	jekyll serve
+	jekyll serve --livereload
 
 build:
 	JEKYLL_ENV=production jekyll build
 
-deploy: build
+deploy:
 	yarn deploy
 
 
