@@ -1,6 +1,7 @@
 ---
 layout: base
 title: About
+description: About Oleksandr Gituliar, author of TastyCode.
 permalink: /about
 ---
 
@@ -22,4 +23,5 @@ since 2009.
 
 **Career.** Always happy to discuss <mark>job opportunities</mark>.
 
-**Contact.** The best way to reach me is at [LinkedIn](https://www.linkedin.com/in/gituliar/) or email <b>ole</b><b>ks</b><b>andr@</b><b>gitu</b><b>liar.</b><b>net</b>
+**Contact.** The best way to reach me is at [LinkedIn](https://www.linkedin.com/in/gituliar/) or
+email <b>ole</b><b>ks</b><b>andr@</b><b>gitu</b><b>liar.</b><b>net</b>
