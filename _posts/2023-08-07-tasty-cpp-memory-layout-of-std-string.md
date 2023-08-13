@@ -3,7 +3,7 @@ author: Oleksandr Gituliar
 date: 2023-08-07
 layout: post
 title: "Tasty C++ – Memory Layout of std::string"
-description: "Learn about memory layout of std::string in c++ standard libraries: MSVC STL, libstdc++, libc++."
+description: "Learn about memory layout of std::string in the most popular c++ standard libraries: MSVC STL, GCC libstdc++, LLVM libc++."
 ---
 
 For a professional C++ developer, it's important to understand memory organization of the data
@@ -26,8 +26,8 @@ also different, which results in a tradeoff between optimal memory or CPU utiliz
 
 ## Long Strings
 
-When people start using `std::string`, it is associated with three data members living somewhere in
-memory:
+When people start using `std::string`, it's usually associated with three data members living
+somewhere in memory:
 
 - **Buffer** – the buffer where string characters are stored.
 - **Size** – the current number of characters in the string.
@@ -170,12 +170,13 @@ how the capacity changes as the string grows in a loop one character at a time:
 
   Capacity growth: 22, 47, 95, 191, 383, 767, 1'535, 3'071, 6'143, 12'287.
 
-## Summary
+## Tha Last Word
 
 The actual implementation of `std::string` varies among the most popular implementations of the C++
-Standard Library. The main difference is in the implementation of the Small String Optimization,
-which is not explicitly specified by the C++ Standard. In the following table we list some of the
-main differences:
+Standard Library. The main difference is in the Small String Optimization, which the C++ Standard
+doesn't define explicitly.
+
+In the following table you'll find some key facts about `std::string`:
 
 | C++ Standard Library | String Size | Small String Capacity | Growth Factor |
 | -------------------- | ----------- | --------------------- | ------------- |
@@ -183,11 +184,14 @@ main differences:
 | GCC libstdc++        | 32 bytes    | 15 chars              | 2x            |
 | LLVM libc++          | 24 bytes    | 22 chars              | 2x            |
 
-In the most cases the standard implementation will be okay for your task. In some cases, you will
-need something slightly different. Rarely, a completely bespoke implementation of a string class
-will be necessary.
+These details are useful to know for every professional C++ developer. They are especially important
+when optimizing for CPU and memory efficiency.
 
-Thanks for reading this far.
+For sure, I'm not the only one curious about how strings are implemented in **other languages**.
+What is different from C++, what is similar? Please, share your knowledge in the comments, I'd love
+to hear from you.
+
+Thanks for reading TastyCode.
 
 **Recommended Links:**
 
