@@ -5,7 +5,7 @@ description: About Oleksandr Gituliar, author of TastyCode.
 permalink: /about
 ---
 
-My name is Oleksandr and I <mark>love tasy code</mark>.
+My name is Oleksandr and <mark>I love tasy code</mark>.
 
 I am a father and a husband. Born in
 <img src="/static/img/ua.svg" height="18px" style="display: inline; position: relative; top: -2px; border-radius: 3px;"/>
