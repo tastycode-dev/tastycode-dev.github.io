@@ -31,7 +31,7 @@
 <meta name="twitter:card" content="summary" />
 <meta property="twitter:title" content="Tasty C++ – Memory Layout of std::string" />
 <script type="application/ld+json">
-{"@context":"https://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Oleksandr Gituliar"},"dateModified":"2023-08-07T00:00:00+02:00","datePublished":"2023-08-07T00:00:00+02:00","description":"Learn about memory layout of std::string in the most popular c++ standard libraries: MSVC STL, GCC libstdc++, LLVM libc++.","headline":"Tasty C++ – Memory Layout of std::string","mainEntityOfPage":{"@type":"WebPage","@id":"https://tastycode.dev/blog/tasty-cpp-memory-layout-of-std-string.html"},"url":"https://tastycode.dev/blog/tasty-cpp-memory-layout-of-std-string.html"}</script>
+{"@context":"https://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Oleksandr Gituliar"},"dateModified":"2023-08-13T00:00:00+02:00","datePublished":"2023-08-07T00:00:00+02:00","description":"Learn about memory layout of std::string in the most popular c++ standard libraries: MSVC STL, GCC libstdc++, LLVM libc++.","headline":"Tasty C++ – Memory Layout of std::string","mainEntityOfPage":{"@type":"WebPage","@id":"https://tastycode.dev/blog/tasty-cpp-memory-layout-of-std-string.html"},"url":"https://tastycode.dev/blog/tasty-cpp-memory-layout-of-std-string.html"}</script>
 <!-- End Jekyll SEO tag -->
 
 </head>
@@ -52,7 +52,7 @@
   <header class="post-header">
     <h1 class="post-title p-name" itemprop="name headline">Tasty C++ – Memory Layout of std::string</h1>
     <p class="mb-0"><time class="dt-published" datetime="2023-08-07T00:00:00+02:00" itemprop="datePublished">
-        2023-08-07
+        2023-08-13
       </time>• 
       <span itemprop="author" itemscope itemtype="http://schema.org/Person">
         <a href="/about" itemprop="name">Oleksandr Gituliar</a></span></p>
@@ -64,9 +64,9 @@ structures, especially when it comes to the containers from the C++ Standard Lib
 of Tasty C++ series we’ll look inside of <code class="language-plaintext highlighter-rouge">std::string</code>, so that you can more effectively work with
 C++ strings and take advantage (or avoid pitfalls) of the C++ Standard Library you are using.</p>
 
-<p>In C++ Standard Library, <code class="language-plaintext highlighter-rouge">std::string</code> is one of the three <a href="https://en.cppreference.com/w/cpp/named_req/ContiguousContainer">contiguous
-containers</a> (the other two are
-<code class="language-plaintext highlighter-rouge">std::array</code> and <code class="language-plaintext highlighter-rouge">std::vector</code>). This means that a sequence of characters is stored in a
+<p>In C++ Standard Library, <code class="language-plaintext highlighter-rouge">std::string</code> is one of the three
+<a href="https://en.cppreference.com/w/cpp/named_req/ContiguousContainer">contiguous containers</a> (the other
+two are <code class="language-plaintext highlighter-rouge">std::array</code> and <code class="language-plaintext highlighter-rouge">std::vector</code>). This means that a sequence of characters is stored in a
 <em>contiguous</em> area of the memory and an individual character can be efficiently accessed by its index
 at O(1) time. The C++ Standard imposes more requirements on the complexity of string operations,
 which we will briefly focus on later this post.</p>
@@ -243,9 +243,9 @@ case.</p>
 <p>Finally, let’s come back to long strings and see how <code class="language-plaintext highlighter-rouge">m_buffer</code> grows when it’s time to allocate
 more memory. Some
 <a href="https://github.com/gcc-mirror/gcc/blob/master/libstdc%2B%2B-v3/include/bits/basic_string.tcc#L142">comments</a>
-in the GCC source code, refer to <em>exponential growth policy</em>. It’s not clear if this is an internal GCC
-decision or part of the C++ Standard. In any case, all three implementations use exponential growth,
-so that <strong>MSVC</strong> has <strong>1.5x factor</strong> growth, while <strong>GCC</strong> and <strong>LLVM</strong> use <strong>2x factor</strong>.</p>
+in the GCC source code, refer to <em>exponential growth policy</em>. It’s not clear if this is an internal
+GCC decision or part of the C++ Standard. In any case, all three implementations use exponential
+growth, so that <strong>MSVC</strong> has <strong>1.5x factor</strong> growth, while <strong>GCC</strong> and <strong>LLVM</strong> use <strong>2x factor</strong>.</p>
 
 <p>The code below illustrates the growth algorithm in each implementation. The capacity examples show
 how the capacity changes as the string grows in a loop one character at a time:</p>
@@ -334,8 +334,8 @@ to hear from you.</p>
 <p><strong>Recommended Links:</strong></p>
 
 <ul>
-  <li><a href="https://www.youtube.com/watch?v=kPR8h4-qZdk">The strange details of std::string at Facebook</a>, CppCon 2016 talk
-by Nicholas Ormrod.</li>
+  <li><a href="https://www.youtube.com/watch?v=kPR8h4-qZdk">The strange details of std::string at Facebook</a>,
+CppCon 2016 talk by Nicholas Ormrod.</li>
   <li><a href="https://joellaity.com/2020/01/31/string.html">libc++’s implementation of std::string</a> by Joel
 Laity with the <a href="https://news.ycombinator.com/item?id=22198158">discussion on HN</a>.</li>
 </ul>
