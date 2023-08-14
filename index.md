@@ -1,6 +1,6 @@
 ---
 layout: base
-description: Blog about programming and quantitative finance
+description: Blog about programming and quantitative finance.
 ---
 
 <ul class="list-inside list-none">

@@ -1,7 +1,7 @@
 ---
 layout: base
 title: About
-description: About Oleksandr Gituliar, author of TastyCode.
+description: About TastyCode and Oleksandr Gituliar.
 permalink: /about
 ---
 

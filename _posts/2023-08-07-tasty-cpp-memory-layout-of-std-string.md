@@ -2,13 +2,13 @@
 layout: post
 author: Oleksandr Gituliar
 date: 2023-08-07
-seo:
-  date_modified: 2023-08-13
 title: "Tasty C++ – Memory Layout of std::string"
 description:
-  "Learn about memory layout of std::string in the most popular c++ standard libraries: MSVC STL,
+  "About memory layout of std::string in the most popular c++ standard libraries: MSVC STL,
   GCC libstdc++, LLVM libc++."
 image: /static/img/2023-08-07/og-image.png
+seo:
+  date_modified: 2023-08-13
 ---
 
 For a professional C++ developer, it's important to understand memory organization of the data
