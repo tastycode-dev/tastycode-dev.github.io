@@ -30,7 +30,7 @@ also different, which results in a tradeoff between optimal memory or CPU utiliz
 
 ## Long Strings
 
-When people start using `std::string`, it's usually associated with three data members living
+When people start using `std::string`, it is usually associated with three pieces of data living
 somewhere in memory:
 
 - **Buffer** – the buffer where string characters are stored.
@@ -47,25 +47,25 @@ class TastyString {
 }
 ```
 
-`TastyString` occupies 24 bytes, which is only 3x more than **fundamental types** such as `void *`,
-`size_t`, or `double`. This means that `TastyString` is cheap to copy or pass by value as a function
-argument. What is not cheap, however, is (1) copying the buffer, especially when the string is long,
-and (2) allocating a buffer for a new, even small, copy of the string.
+This representation takes _24 bytes_ and is very close to the real code.
 
-Let's look how it actually looks like with `std::string`. In the _most popular implementations_ of
-the C++ Standard Library the size of `std::string` object is the following:
+Let's see how this compares to the **real size** of `std::string`. In the most popular
+implementations of the C++ Standard Library the size of `std::string` is the following:
 
-| C++ Standard Library | Size of std::string() |
-| -------------------- | --------------------- |
-| MSVC STL             | 32 bytes              |
-| GCC libstdc++        | 32 bytes              |
-| LLVM libc++          | 24 bytes              |
+| C++ Standard Library                                | Size of std::string() |
+| --------------------------------------------------- | --------------------- |
+| [MSVC STL](https://github.com/microsoft/STL)        | 32 bytes              |
+| [GCC libstdc++](https://gcc.gnu.org/wiki/Libstdc++) | 32 bytes              |
+| [LLVM libc++](https://libcxx.llvm.org/)             | 24 bytes              |
 
-To our surprise, only **LLVM** allocates expected **24 bytes** for `std::string`. The other two,
+What a surprise, only **LLVM** allocates expected **24 bytes** for `std::string`. The other two,
 **MSVC** and **GCC**, allocate **32 bytes** for the same string. (Numbers in the table are for -O3
 optimization. Note that MSVC allocates 40 bytes for `std::string` in the _debug mode_.)
 
-Is this information optimal to represent a string ?
+Let's get some intuition about why various implementation allocate different amount of memory for
+the same object.
+
+<!-- Is this information optimal to represent a string ?
 
 In fact, the _capacity_ is not required. We can use _size_ and _buffer_ only, but when the string
 grows, a new buffer should be allocated on the heap (because we can't tell how many extra characters
@@ -75,19 +75,22 @@ the buffer capacity.
 The _buffer_ is a [null terminated string](https://en.wikipedia.org/wiki/Null-terminated_string)
 well known in C.
 
+`TastyString` occupies 24 bytes, which is only 3x more than **fundamental types** such as `void *`,
+`size_t`, or `double`. This means that `TastyString` is cheap to copy or pass by value as a function
+argument. What is not cheap, however, is (1) copying the buffer, especially when the string is long,
+and (2) allocating a buffer for a new, even small, copy of the string. -->
+
 ## Small Strings
 
-Let's get some intuition about why various implementation allocate different amount of memory for
-the same object.
+The members of `TastyString` and `std::string` contain only the _auxiliary data_, while the _actual
+data_ (characters) is stored in the buffer. It seems inefficient to reserve 24 or 32 bytes for the
+auxiliary data when the actual data is smaller than that, isn't it?
 
-The members of `TastyString` contain only auxiliary data, while the actual data is stored in the
-buffer. It seems inefficient to reserve 24 or 32 bytes for auxiliary data (and allocate extra
-dynamic memory) when the actual data is smaller than that, isn't it?
-
-**Small String Optimization.** This optimization, also known as SSO, is to keep the actual data in
-the auxiliary region (when it is small enough). This way `std::string` objects become cheap to copy
-and construct (almost like fundamental types ...) as we don't allocate dynamic memory. This
-technique is popular among various implementations, however is not a part of the C++ Standard.
+**Small String Optimization.** This optimization, also known as SSO, is to store the actual data in
+the auxiliary region (when it is small enough). This way `std::string` becomes cheap to copy and
+construct (almost like fundamental types such as `void *`, `size_t`, or `double`) as we don't
+allocate any dynamic memory. This technique is popular among various implementations, however is not
+a part of the C++ Standard.
 
 It makes sense now why some implementations increase the auxiliary region to 32 bytes --- to store
 bigger strings in the auxiliary region before switching into the regular mode which dynamically
@@ -102,9 +105,10 @@ This is what `std::string().capacity()` will tell us:
 | GCC libstdc++        | 15 chars              |
 | LLVM libc++          | 22 chars              |
 
-What a surprise! LLVM with its 24 bytes for `std::string` fits more characters than MSVC or GCC with
-their 32 bytes. (In fact, it's possible to fully utilize the auxiliary region, so that n-byte area
-fits n-1 chars and `'\0'`.)
+One more surprise: LLVM with its 24 bytes for `std::string` fits more characters than MSVC or GCC
+with their 32 bytes. (In fact, it's possible to fully utilize the auxiliary region, so that n-byte
+area fits n-1 chars and `'\0'`. Watch
+[CppCon 2016 talk](https://www.youtube.com/watch?v=kPR8h4-qZdk) for details.)
 
 **How fast are small strings?** As with many things in programming, there is a tradeoff between
 memory utilization and code complexity. In other words, the more characters we want to fit into the
@@ -188,7 +192,7 @@ In the following table you'll find some key facts about `std::string`:
 | GCC libstdc++        | 32 bytes    | 15 chars              | 2x            |
 | LLVM libc++          | 24 bytes    | 22 chars              | 2x            |
 
-These details are useful to know for every professional C++ developer. They are especially important
+These details will be useful for every professional C++ developer. They are especially important
 when optimizing for CPU and memory efficiency.
 
 For sure, I'm not the only one curious about how strings are implemented in **other languages**.
