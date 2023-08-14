@@ -71,18 +71,19 @@ containers</a> (together with
 <code class="language-plaintext highlighter-rouge">std::array</code> and <code class="language-plaintext highlighter-rouge">std::vector</code>). This means that a sequence of characters is stored in a
 <em>contiguous</em> area of the memory and an individual character can be efficiently accessed by its index
 at O(1) time. The C++ Standard imposes more requirements on the complexity of string operations,
-which we will briefly focus on later this post.</p>
+which we will briefly focus on later in this post.</p>
 
-<p>What is important to remember is that the C++ Standard doesn’t impose exact implementation of
-<code class="language-plaintext highlighter-rouge">std::string</code>, nor does it specify the exact size of <code class="language-plaintext highlighter-rouge">std::string</code>. In practice, as we’ll see, the
-most popular implementations of the C++ Standard Library allocate 24 or 32 bytes for the same
-<code class="language-plaintext highlighter-rouge">std::string</code> object (the data buffer excluded). In addition, the techniques to organize internal
-memory layout are also different, which results in a tradeoff between optimal memory or CPU
-utilization.</p>
+<p>If we are talking about the C++ Standard, it’s important to remember that it doesn’t impose exact
+implementation of <code class="language-plaintext highlighter-rouge">std::string</code>, nor does it specify the exact size of <code class="language-plaintext highlighter-rouge">std::string</code>. In practice,
+as we’ll see, the most popular implementations of the C++ Standard Library allocate 24 or 32 bytes
+for the same <code class="language-plaintext highlighter-rouge">std::string</code> object (excluding the data buffer). On top of that, the memory layout of
+string objects is also different, which is a result of a tradeoff between optimal memory and CPU
+utilization, as we’ll also see below.</p>
 
 <h2 id="long-strings">Long Strings</h2>
 
-<p>When people start using <code class="language-plaintext highlighter-rouge">std::string</code>, it’s usually associated with three data fields:</p>
+<p>For people just starting to work with strings in C++, <code class="language-plaintext highlighter-rouge">std::string</code> is usually associated with three
+data fields:</p>
 
 <ul>
   <li><strong>Buffer</strong> – the buffer where string characters are stored, allocated on the heap.</li>
@@ -99,10 +100,11 @@ utilization.</p>
 <span class="p">}</span>
 </code></pre></div></div>
 
-<p>This representation takes <em>24 bytes</em> and is very close to the real code.</p>
+<p>This representation takes <em>24 bytes</em> and is very close to the production code.</p>
 
-<p>Let’s see how this compares to the <strong>real size</strong> of <code class="language-plaintext highlighter-rouge">std::string</code>. In the most popular
-implementations of the C++ Standard Library the size of <code class="language-plaintext highlighter-rouge">std::string</code> is the following:</p>
+<p>Let’s see how this compares to the <strong>actualjj size</strong> of <code class="language-plaintext highlighter-rouge">std::string</code>. This is given by
+<code class="language-plaintext highlighter-rouge">sizeof(std::string)</code> and in the most popular implementations of the C++ Standard Library is the
+following:</p>
 
 <table>
   <thead>
@@ -151,21 +153,22 @@ and (2) allocating a buffer for a new, even small, copy of the string. -->
 
 <h2 id="small-strings">Small Strings</h2>
 
-<p>The members of <code class="language-plaintext highlighter-rouge">TastyString</code> and <code class="language-plaintext highlighter-rouge">std::string</code> contain only the <em>auxiliary data</em>, while the <em>actual
-data</em> (characters) is stored in the buffer. It seems inefficient to reserve 24 or 32 bytes for the
-auxiliary data when the actual data is smaller than that, isn’t it?</p>
+<p>You have already noticed that the fields of <code class="language-plaintext highlighter-rouge">TastyString</code> and <code class="language-plaintext highlighter-rouge">std::string</code> contain only the
+<em>auxiliary data</em>, while the <em>actual data</em> (characters) is stored in the buffer allocated on the
+heap. However, when the actual data is small enough, it seems inefficient to reserve 24 or 32 bytes
+for the auxiliary data, isn’t it?</p>
 
-<p><strong>Small String Optimization.</strong> This optimization, also known as SSO, is to store the actual data in
-the auxiliary region (when it is small enough). This way <code class="language-plaintext highlighter-rouge">std::string</code> becomes cheap to copy and
-construct (almost like fundamental types such as <code class="language-plaintext highlighter-rouge">void *</code>, <code class="language-plaintext highlighter-rouge">size_t</code>, or <code class="language-plaintext highlighter-rouge">double</code>) as we don’t
-allocate any dynamic memory. This technique is popular among various implementations, however is not
-a part of the C++ Standard.</p>
+<p><strong>Small String Optimization.</strong> This is what the <em>small string optimization</em> (aka SSO) if used for.
+The idea is to store the actual data in the auxiliary region with no need to allocate the buffer on
+the heap, that makes <code class="language-plaintext highlighter-rouge">std::string</code> cheap to copy and construct (as it’s only 3x-4x time bigger than
+fundamental types such as <code class="language-plaintext highlighter-rouge">void *</code>, <code class="language-plaintext highlighter-rouge">size_t</code>, or <code class="language-plaintext highlighter-rouge">double</code>). This technique is popular among various
+implementations, however is not a part of the C++ Standard.</p>
 
-<p>It makes sense now why some implementations increase the auxiliary region to 32 bytes — to store
-bigger strings in the auxiliary region before switching into the regular mode which dynamically
+<p>Now it makes sense why some implementations increase the auxiliary region to 32 bytes — to store
+longer <em>small strings</em> in the auxiliary region before switching into the regular mode with dynamically
 allocated buffer.</p>
 
-<p><strong>How big are small strings?</strong> Let’s see how many characters the auxiliary region fits in practice.
+<p><strong>How big are small strings?</strong> Let’s see how many characters the auxiliary region can store.
 This is what <code class="language-plaintext highlighter-rouge">std::string().capacity()</code> will tell us:</p>
 
 <table>
@@ -191,15 +194,15 @@ This is what <code class="language-plaintext highlighter-rouge">std::string().ca
   </tbody>
 </table>
 
-<p>One more surprise: LLVM with its 24 bytes for <code class="language-plaintext highlighter-rouge">std::string</code> fits more characters than MSVC or GCC
+<p>Another surprise: LLVM with its 24 bytes for <code class="language-plaintext highlighter-rouge">std::string</code> fits more characters than MSVC or GCC
 with their 32 bytes. (In fact, it’s possible to fully utilize the auxiliary region, so that n-byte
 area fits n-1 chars and <code class="language-plaintext highlighter-rouge">'\0'</code>. Watch
 <a href="https://www.youtube.com/watch?v=kPR8h4-qZdk">CppCon 2016 talk</a> for details.)</p>
 
 <p><strong>How fast are small strings?</strong> As with many things in programming, there is a tradeoff between
-memory utilization and code complexity. In other words, the more characters we want to fit into the
-auxiliary memory, the more complex logic we should introduce. This results not only in more assembly
-operations, but also into branching that is not good for CPU pipelines to evaluate.</p>
+memory utilization and code complexity. In other words, the more characters we want to squeeze into
+the auxiliary memory, the more <em>complex logic</em> we should invent. This results not only in more
+assembly operations, but also into branching that is not good for CPU pipelines.</p>
 
 <p>To illustrate this point, let’s see what the most commonly used <code class="language-plaintext highlighter-rouge">size()</code> method compiles to in
 various standard libraries:</p>
@@ -240,21 +243,21 @@ various standard libraries:</p>
   </tbody>
 </table>
 
-<p>LLVM code is more complex for other string methods too. It’s hard to say how badly this impacts the
-overall performance, so experiment with various implementations and benchmark your particular use
-case.</p>
+<p>LLVM code remains more complex for other methods too. It’s hard to say how badly this impacts the
+overall performance. The best advice is to keep this knowledge at hand and, for your particular use
+case, benchmark and experiment with various implementations.</p>
 
 <h2 id="memory-allocation-policy">Memory Allocation Policy</h2>
 
-<p>Finally, let’s come back to long strings and see how <code class="language-plaintext highlighter-rouge">m_buffer</code> grows when it’s time to allocate
-more memory. Some
+<p>Finally, let’s come back to a long string mode and see how <code class="language-plaintext highlighter-rouge">m_buffer</code> grows when our string becomes
+bigger. Some
 <a href="https://github.com/gcc-mirror/gcc/blob/master/libstdc%2B%2B-v3/include/bits/basic_string.tcc#L142">comments</a>
-in the GCC source code, refer to <em>exponential growth policy</em>. It’s not clear if this is an internal
+in the GCC source code, refer to the <em>exponential growth policy</em>. It’s not clear if this is an internal
 GCC decision or part of the C++ Standard. In any case, all three implementations use exponential
 growth, so that <strong>MSVC</strong> has <strong>1.5x factor</strong> growth, while <strong>GCC</strong> and <strong>LLVM</strong> use <strong>2x factor</strong>.</p>
 
 <p>The code below illustrates the growth algorithm in each implementation. The capacity examples show
-how the capacity changes as the string grows in a loop one character at a time:</p>
+how the capacity changes as the string grows one character at a time in a loop:</p>
 
 <ul>
   <li>
@@ -295,7 +298,7 @@ how the capacity changes as the string grows in a loop one character at a time:<
 Standard Library. The main difference is in the Small String Optimization, which the C++ Standard
 doesn’t define explicitly.</p>
 
-<p>In the following table you’ll find some key facts about <code class="language-plaintext highlighter-rouge">std::string</code>:</p>
+<p>The following table summarizes some key facts about <code class="language-plaintext highlighter-rouge">std::string</code>:</p>
 
 <table>
   <thead>
