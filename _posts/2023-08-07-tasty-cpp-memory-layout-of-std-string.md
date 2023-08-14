@@ -1,41 +1,42 @@
 ---
+layout: post
 author: Oleksandr Gituliar
 date: 2023-08-07
 seo:
   date_modified: 2023-08-13
-layout: post
 title: "Tasty C++ – Memory Layout of std::string"
 description:
   "Learn about memory layout of std::string in the most popular c++ standard libraries: MSVC STL,
   GCC libstdc++, LLVM libc++."
+# image: /static/img/tasty-cpp-memory-layout-of-cpp-string.png
 ---
 
 For a professional C++ developer, it's important to understand memory organization of the data
 structures, especially when it comes to the containers from the C++ Standard Library. In this post
 of Tasty C++ series we'll look inside of `std::string`, so that you can more effectively work with
-C++ strings and take advantage (or avoid pitfalls) of the C++ Standard Library you are using.
+C++ strings and take advantage and avoid pitfalls of the C++ Standard Library you are using.
 
-In C++ Standard Library, `std::string` is one of the three
-[contiguous containers](https://en.cppreference.com/w/cpp/named_req/ContiguousContainer) (the other
-two are `std::array` and `std::vector`). This means that a sequence of characters is stored in a
+In C++ Standard Library, `std::string` is one of the three [contiguous
+containers](https://en.cppreference.com/w/cpp/named_req/ContiguousContainer) (together with
+`std::array` and `std::vector`). This means that a sequence of characters is stored in a
 _contiguous_ area of the memory and an individual character can be efficiently accessed by its index
 at O(1) time. The C++ Standard imposes more requirements on the complexity of string operations,
 which we will briefly focus on later this post.
 
 What is important to remember is that the C++ Standard doesn't impose exact implementation of
-`std::string`, nor does it specify how much memory should `std::string` allocate. In practice, as
-we'll see, the most popular implementations of the C++ Standard Library allocate 24 or 32 bytes for
-the same `std::string` object. In addition, the techniques to organize internal memory layout are
-also different, which results in a tradeoff between optimal memory or CPU utilization.
+`std::string`, nor does it specify the exact size of `std::string`. In practice, as we'll see, the
+most popular implementations of the C++ Standard Library allocate 24 or 32 bytes for the same
+`std::string` object (the data buffer excluded). In addition, the techniques to organize internal
+memory layout are also different, which results in a tradeoff between optimal memory or CPU
+utilization.
 
 ## Long Strings
 
-When people start using `std::string`, it is usually associated with three pieces of data living
-somewhere in memory:
+When people start using `std::string`, it's usually associated with three data fields:
 
-- **Buffer** – the buffer where string characters are stored.
+- **Buffer** – the buffer where string characters are stored, allocated on the heap.
 - **Size** – the current number of characters in the string.
-- **Capacity** – the max number of character the buffer can fit.
+- **Capacity** – the max number of character the buffer can fit, a size of the buffer.
 
 Talking C++ language, this picture could be expressed as the following class:
 

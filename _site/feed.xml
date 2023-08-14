@@ -1,30 +1,30 @@
-<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="4.3.2">Jekyll</generator><link href="https://tastycode.dev/feed.xml" rel="self" type="application/atom+xml" /><link href="https://tastycode.dev/" rel="alternate" type="text/html" /><updated>2023-08-14T07:42:20+02:00</updated><id>https://tastycode.dev/feed.xml</id><title type="html">TastyCode</title><entry><title type="html">Tasty C++ – Memory Layout of std::string</title><link href="https://tastycode.dev/blog/tasty-cpp-memory-layout-of-std-string.html" rel="alternate" type="text/html" title="Tasty C++ – Memory Layout of std::string" /><published>2023-08-07T00:00:00+02:00</published><updated>2023-08-07T00:00:00+02:00</updated><id>https://tastycode.dev/blog/tasty-cpp-memory-layout-of-std-string</id><content type="html" xml:base="https://tastycode.dev/blog/tasty-cpp-memory-layout-of-std-string.html"><![CDATA[<p>For a professional C++ developer, it’s important to understand memory organization of the data
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="4.3.2">Jekyll</generator><link href="https://tastycode.dev/feed.xml" rel="self" type="application/atom+xml" /><link href="https://tastycode.dev/" rel="alternate" type="text/html" /><updated>2023-08-14T07:53:44+02:00</updated><id>https://tastycode.dev/feed.xml</id><title type="html">TastyCode</title><entry><title type="html">Tasty C++ – Memory Layout of std::string</title><link href="https://tastycode.dev/blog/tasty-cpp-memory-layout-of-std-string" rel="alternate" type="text/html" title="Tasty C++ – Memory Layout of std::string" /><published>2023-08-07T00:00:00+02:00</published><updated>2023-08-07T00:00:00+02:00</updated><id>https://tastycode.dev/blog/tasty-cpp-memory-layout-of-std-string</id><content type="html" xml:base="https://tastycode.dev/blog/tasty-cpp-memory-layout-of-std-string"><![CDATA[<p>For a professional C++ developer, it’s important to understand memory organization of the data
 structures, especially when it comes to the containers from the C++ Standard Library. In this post
 of Tasty C++ series we’ll look inside of <code class="language-plaintext highlighter-rouge">std::string</code>, so that you can more effectively work with
-C++ strings and take advantage (or avoid pitfalls) of the C++ Standard Library you are using.</p>
+C++ strings and take advantage and avoid pitfalls of the C++ Standard Library you are using.</p>
 
-<p>In C++ Standard Library, <code class="language-plaintext highlighter-rouge">std::string</code> is one of the three
-<a href="https://en.cppreference.com/w/cpp/named_req/ContiguousContainer">contiguous containers</a> (the other
-two are <code class="language-plaintext highlighter-rouge">std::array</code> and <code class="language-plaintext highlighter-rouge">std::vector</code>). This means that a sequence of characters is stored in a
+<p>In C++ Standard Library, <code class="language-plaintext highlighter-rouge">std::string</code> is one of the three <a href="https://en.cppreference.com/w/cpp/named_req/ContiguousContainer">contiguous
+containers</a> (together with
+<code class="language-plaintext highlighter-rouge">std::array</code> and <code class="language-plaintext highlighter-rouge">std::vector</code>). This means that a sequence of characters is stored in a
 <em>contiguous</em> area of the memory and an individual character can be efficiently accessed by its index
 at O(1) time. The C++ Standard imposes more requirements on the complexity of string operations,
 which we will briefly focus on later this post.</p>
 
 <p>What is important to remember is that the C++ Standard doesn’t impose exact implementation of
-<code class="language-plaintext highlighter-rouge">std::string</code>, nor does it specify how much memory should <code class="language-plaintext highlighter-rouge">std::string</code> allocate. In practice, as
-we’ll see, the most popular implementations of the C++ Standard Library allocate 24 or 32 bytes for
-the same <code class="language-plaintext highlighter-rouge">std::string</code> object. In addition, the techniques to organize internal memory layout are
-also different, which results in a tradeoff between optimal memory or CPU utilization.</p>
+<code class="language-plaintext highlighter-rouge">std::string</code>, nor does it specify the exact size of <code class="language-plaintext highlighter-rouge">std::string</code>. In practice, as we’ll see, the
+most popular implementations of the C++ Standard Library allocate 24 or 32 bytes for the same
+<code class="language-plaintext highlighter-rouge">std::string</code> object (the data buffer excluded). In addition, the techniques to organize internal
+memory layout are also different, which results in a tradeoff between optimal memory or CPU
+utilization.</p>
 
 <h2 id="long-strings">Long Strings</h2>
 
-<p>When people start using <code class="language-plaintext highlighter-rouge">std::string</code>, it is usually associated with three pieces of data living
-somewhere in memory:</p>
+<p>When people start using <code class="language-plaintext highlighter-rouge">std::string</code>, it’s usually associated with three data fields:</p>
 
 <ul>
-  <li><strong>Buffer</strong> – the buffer where string characters are stored.</li>
+  <li><strong>Buffer</strong> – the buffer where string characters are stored, allocated on the heap.</li>
   <li><strong>Size</strong> – the current number of characters in the string.</li>
-  <li><strong>Capacity</strong> – the max number of character the buffer can fit.</li>
+  <li><strong>Capacity</strong> – the max number of character the buffer can fit, a size of the buffer.</li>
 </ul>
 
 <p>Talking C++ language, this picture could be expressed as the following class:</p>
