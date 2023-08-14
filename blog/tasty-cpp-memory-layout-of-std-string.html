@@ -23,15 +23,15 @@
 <meta property="og:locale" content="en_US" />
 <meta name="description" content="Learn about memory layout of std::string in the most popular c++ standard libraries: MSVC STL, GCC libstdc++, LLVM libc++." />
 <meta property="og:description" content="Learn about memory layout of std::string in the most popular c++ standard libraries: MSVC STL, GCC libstdc++, LLVM libc++." />
-<link rel="canonical" href="https://tastycode.dev/blog/tasty-cpp-memory-layout-of-std-string.html" />
-<meta property="og:url" content="https://tastycode.dev/blog/tasty-cpp-memory-layout-of-std-string.html" />
+<link rel="canonical" href="https://tastycode.dev/blog/tasty-cpp-memory-layout-of-std-string" />
+<meta property="og:url" content="https://tastycode.dev/blog/tasty-cpp-memory-layout-of-std-string" />
 <meta property="og:site_name" content="TastyCode" />
 <meta property="og:type" content="article" />
 <meta property="article:published_time" content="2023-08-07T00:00:00+02:00" />
 <meta name="twitter:card" content="summary" />
 <meta property="twitter:title" content="Tasty C++ – Memory Layout of std::string" />
 <script type="application/ld+json">
-{"@context":"https://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Oleksandr Gituliar"},"dateModified":"2023-08-13T00:00:00+02:00","datePublished":"2023-08-07T00:00:00+02:00","description":"Learn about memory layout of std::string in the most popular c++ standard libraries: MSVC STL, GCC libstdc++, LLVM libc++.","headline":"Tasty C++ – Memory Layout of std::string","mainEntityOfPage":{"@type":"WebPage","@id":"https://tastycode.dev/blog/tasty-cpp-memory-layout-of-std-string.html"},"url":"https://tastycode.dev/blog/tasty-cpp-memory-layout-of-std-string.html"}</script>
+{"@context":"https://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Oleksandr Gituliar"},"dateModified":"2023-08-13T00:00:00+02:00","datePublished":"2023-08-07T00:00:00+02:00","description":"Learn about memory layout of std::string in the most popular c++ standard libraries: MSVC STL, GCC libstdc++, LLVM libc++.","headline":"Tasty C++ – Memory Layout of std::string","mainEntityOfPage":{"@type":"WebPage","@id":"https://tastycode.dev/blog/tasty-cpp-memory-layout-of-std-string"},"url":"https://tastycode.dev/blog/tasty-cpp-memory-layout-of-std-string"}</script>
 <!-- End Jekyll SEO tag -->
 
 </head>
@@ -43,7 +43,7 @@
         href="/">
         <img src="/static/img/logo.png" class="inline-flex py-4 me-2 w-8"><span class="align-middle">TastyCode</span>
       </a>
-      <div class=" my-auto text-xl font-bold">
+      <div class=" my-auto text-xl">
         <a class="text-black" href="/about">About</a>
       </div>
     </nav>
@@ -97,13 +97,10 @@ utilization.</p>
 <span class="p">}</span>
 </code></pre></div></div>
 
-<p><code class="language-plaintext highlighter-rouge">TastyString</code> occupies 24 bytes, which is only 3x more than <strong>fundamental types</strong> such as <code class="language-plaintext highlighter-rouge">void *</code>,
-<code class="language-plaintext highlighter-rouge">size_t</code>, or <code class="language-plaintext highlighter-rouge">double</code>. This means that <code class="language-plaintext highlighter-rouge">TastyString</code> is cheap to copy or pass by value as a function
-argument. What is not cheap, however, is (1) copying the buffer, especially when the string is long,
-and (2) allocating a buffer for a new, even small, copy of the string.</p>
+<p>This representation takes <em>24 bytes</em> and is very close to the real code.</p>
 
-<p>Let’s look how it actually looks like with <code class="language-plaintext highlighter-rouge">std::string</code>. In the <em>most popular implementations</em> of
-the C++ Standard Library the size of <code class="language-plaintext highlighter-rouge">std::string</code> object is the following:</p>
+<p>Let’s see how this compares to the <strong>real size</strong> of <code class="language-plaintext highlighter-rouge">std::string</code>. In the most popular
+implementations of the C++ Standard Library the size of <code class="language-plaintext highlighter-rouge">std::string</code> is the following:</p>
 
 <table>
   <thead>
@@ -114,47 +111,53 @@ the C++ Standard Library the size of <code class="language-plaintext highlighter
   </thead>
   <tbody>
     <tr>
-      <td>MSVC STL</td>
+      <td><a href="https://github.com/microsoft/STL">MSVC STL</a></td>
       <td>32 bytes</td>
     </tr>
     <tr>
-      <td>GCC libstdc++</td>
+      <td><a href="https://gcc.gnu.org/wiki/Libstdc++">GCC libstdc++</a></td>
       <td>32 bytes</td>
     </tr>
     <tr>
-      <td>LLVM libc++</td>
+      <td><a href="https://libcxx.llvm.org/">LLVM libc++</a></td>
       <td>24 bytes</td>
     </tr>
   </tbody>
 </table>
 
-<p>To our surprise, only <strong>LLVM</strong> allocates expected <strong>24 bytes</strong> for <code class="language-plaintext highlighter-rouge">std::string</code>. The other two,
+<p>What a surprise, only <strong>LLVM</strong> allocates expected <strong>24 bytes</strong> for <code class="language-plaintext highlighter-rouge">std::string</code>. The other two,
 <strong>MSVC</strong> and <strong>GCC</strong>, allocate <strong>32 bytes</strong> for the same string. (Numbers in the table are for -O3
 optimization. Note that MSVC allocates 40 bytes for <code class="language-plaintext highlighter-rouge">std::string</code> in the <em>debug mode</em>.)</p>
-
-<p>Is this information optimal to represent a string ?</p>
-
-<p>In fact, the <em>capacity</em> is not required. We can use <em>size</em> and <em>buffer</em> only, but when the string
-grows, a new buffer should be allocated on the heap (because we can’t tell how many extra characters
-the current buffer can fit). Since heap allocation is slow, such allocations are avoided by tracking
-the buffer capacity.</p>
-
-<p>The <em>buffer</em> is a <a href="https://en.wikipedia.org/wiki/Null-terminated_string">null terminated string</a>
-well known in C.</p>
-
-<h2 id="small-strings">Small Strings</h2>
 
 <p>Let’s get some intuition about why various implementation allocate different amount of memory for
 the same object.</p>
 
-<p>The members of <code class="language-plaintext highlighter-rouge">TastyString</code> contain only auxiliary data, while the actual data is stored in the
-buffer. It seems inefficient to reserve 24 or 32 bytes for auxiliary data (and allocate extra
-dynamic memory) when the actual data is smaller than that, isn’t it?</p>
+<!-- Is this information optimal to represent a string ?
 
-<p><strong>Small String Optimization.</strong> This optimization, also known as SSO, is to keep the actual data in
-the auxiliary region (when it is small enough). This way <code class="language-plaintext highlighter-rouge">std::string</code> objects become cheap to copy
-and construct (almost like fundamental types …) as we don’t allocate dynamic memory. This
-technique is popular among various implementations, however is not a part of the C++ Standard.</p>
+In fact, the _capacity_ is not required. We can use _size_ and _buffer_ only, but when the string
+grows, a new buffer should be allocated on the heap (because we can't tell how many extra characters
+the current buffer can fit). Since heap allocation is slow, such allocations are avoided by tracking
+the buffer capacity.
+
+The _buffer_ is a [null terminated string](https://en.wikipedia.org/wiki/Null-terminated_string)
+well known in C.
+
+`TastyString` occupies 24 bytes, which is only 3x more than **fundamental types** such as `void *`,
+`size_t`, or `double`. This means that `TastyString` is cheap to copy or pass by value as a function
+argument. What is not cheap, however, is (1) copying the buffer, especially when the string is long,
+and (2) allocating a buffer for a new, even small, copy of the string. -->
+
+<h2 id="small-strings">Small Strings</h2>
+
+<p>The members of <code class="language-plaintext highlighter-rouge">TastyString</code> and <code class="language-plaintext highlighter-rouge">std::string</code> contain only the <em>auxiliary data</em>, while the <em>actual
+data</em> (characters) is stored in the buffer. It seems inefficient to reserve 24 or 32 bytes for the
+auxiliary data when the actual data is smaller than that, isn’t it?</p>
+
+<p><strong>Small String Optimization.</strong> This optimization, also known as SSO, is to store the actual data in
+the auxiliary region (when it is small enough). This way <code class="language-plaintext highlighter-rouge">std::string</code> becomes cheap to copy and
+construct (almost like fundamental types such as <code class="language-plaintext highlighter-rouge">void *</code>, <code class="language-plaintext highlighter-rouge">size_t</code>, or <code class="language-plaintext highlighter-rouge">double</code>) as we don’t
+allocate any dynamic memory. This technique is popular among various implementations, however is not
+a part of the C++ Standard.</p>
 
 <p>It makes sense now why some implementations increase the auxiliary region to 32 bytes — to store
 bigger strings in the auxiliary region before switching into the regular mode which dynamically
@@ -186,9 +189,10 @@ This is what <code class="language-plaintext highlighter-rouge">std::string().ca
   </tbody>
 </table>
 
-<p>What a surprise! LLVM with its 24 bytes for <code class="language-plaintext highlighter-rouge">std::string</code> fits more characters than MSVC or GCC with
-their 32 bytes. (In fact, it’s possible to fully utilize the auxiliary region, so that n-byte area
-fits n-1 chars and <code class="language-plaintext highlighter-rouge">'\0'</code>.)</p>
+<p>One more surprise: LLVM with its 24 bytes for <code class="language-plaintext highlighter-rouge">std::string</code> fits more characters than MSVC or GCC
+with their 32 bytes. (In fact, it’s possible to fully utilize the auxiliary region, so that n-byte
+area fits n-1 chars and <code class="language-plaintext highlighter-rouge">'\0'</code>. Watch
+<a href="https://www.youtube.com/watch?v=kPR8h4-qZdk">CppCon 2016 talk</a> for details.)</p>
 
 <p><strong>How fast are small strings?</strong> As with many things in programming, there is a tradeoff between
 memory utilization and code complexity. In other words, the more characters we want to fit into the
@@ -322,7 +326,7 @@ doesn’t define explicitly.</p>
   </tbody>
 </table>
 
-<p>These details are useful to know for every professional C++ developer. They are especially important
+<p>These details will be useful for every professional C++ developer. They are especially important
 when optimizing for CPU and memory efficiency.</p>
 
 <p>For sure, I’m not the only one curious about how strings are implemented in <strong>other languages</strong>.
@@ -344,7 +348,7 @@ Laity with the <a href="https://news.ycombinator.com/item?id=22198158">discussio
 
   </div>
 
-  <!--<a class="u-url" href="/blog/tasty-cpp-memory-layout-of-std-string.html" hidden></a> -->
+  <!--<a class="u-url" href="/blog/tasty-cpp-memory-layout-of-std-string" hidden></a> -->
 </article>
   </div>
 </body>
