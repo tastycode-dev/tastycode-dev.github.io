@@ -8,7 +8,7 @@ title: "Tasty C++ – Memory Layout of std::string"
 description:
   "Learn about memory layout of std::string in the most popular c++ standard libraries: MSVC STL,
   GCC libstdc++, LLVM libc++."
-# image: /static/img/tasty-cpp-memory-layout-of-cpp-string.png
+image: /static/img/logo-xl.png
 ---
 
 For a professional C++ developer, it's important to understand memory organization of the data
