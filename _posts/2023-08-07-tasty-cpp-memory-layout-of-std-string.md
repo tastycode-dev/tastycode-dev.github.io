@@ -8,7 +8,7 @@ title: "Tasty C++ – Memory Layout of std::string"
 description:
   "Learn about memory layout of std::string in the most popular c++ standard libraries: MSVC STL,
   GCC libstdc++, LLVM libc++."
-image: /static/img/logo-xl.png
+image: /static/img/2023-08-07/og-image.png
 ---
 
 For a professional C++ developer, it's important to understand memory organization of the data
@@ -122,16 +122,16 @@ various standard libraries:
 **GCC stdlibc++**. The function directly copies `m_size` field into the output register (see
 <https://godbolt.org/z/7nYe9rWdE>):
 
-| Example                                                  | GCC libstdc++                                                 |
-| -------------------------------------------------------- | ------------------------------------------------------------- |
-| ![string size C++ code](/static/img/string-size-src.png) | ![string size GCC assembler](/static/img/string-size-gcc.png) |
+| Example                                                             | GCC libstdc++                                                            |
+| ------------------------------------------------------------------- | ------------------------------------------------------------------------ |
+| ![string size C++ code](/static/img/2023-08-07/string-size-src.png) | ![string size GCC assembler](/static/img/2023-08-07/string-size-gcc.png) |
 
 **LLVM libc++**. The function at first checks if the string is short and then calculates its size
 (see <https://godbolt.org/z/xM349cG5P>).
 
-| Example                                                  | LLVM libc++                                                     |
-| -------------------------------------------------------- | --------------------------------------------------------------- |
-| ![string size C++ code](/static/img/string-size-src.png) | ![string size LLVM assembler](/static/img/string-size-llvm.png) |
+| Example                                                             | LLVM libc++                                                                |
+| ------------------------------------------------------------------- | -------------------------------------------------------------------------- |
+| ![string size C++ code](/static/img/2023-08-07/string-size-src.png) | ![string size LLVM assembler](/static/img/2023-08-07/string-size-llvm.png) |
 
 LLVM code is more complex for other string methods too. It's hard to say how badly this impacts the
 overall performance, so experiment with various implementations and benchmark your particular use
