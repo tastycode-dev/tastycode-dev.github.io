@@ -1,7 +1,7 @@
 .PHONY: serve build deploy install
 
 serve:
-	jekyll serve --livereload
+	jekyll serve --drafts --livereload
 
 build:
 	JEKYLL_ENV=production jekyll build
