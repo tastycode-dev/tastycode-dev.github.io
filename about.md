@@ -1,16 +1,16 @@
 ---
 layout: base
 title: About
-description: About TastyCode and Oleksandr Gituliar.
+description: About TastyCode and its author Oleksandr Gituliar.
 permalink: /about
 ---
 
 My name is Oleksandr and <mark>I love tasy code</mark>.
 
 I am a father and a husband. Born in
-<img src="/static/img/ua.svg" height="18px" style="display: inline; position: relative; top: -2px; border-radius: 3px;"/>
+<img src="/assets/img/ua.svg" height="18px" style="display: inline; position: relative; top: -2px; border-radius: 3px;"/>
 in 1987. Live
-<img src="/static/img/eu.svg" height="18px" style="display: inline; position: relative; top: -2px; border-radius: 3px;"/>
+<img src="/assets/img/eu.svg" height="18px" style="display: inline; position: relative; top: -2px; border-radius: 3px;"/>
 since 2009.
 
 **Resume.** See [LinkedIn](https://www.linkedin.com/in/gituliar/) or [gituliar.pdf](gituliar.pdf).

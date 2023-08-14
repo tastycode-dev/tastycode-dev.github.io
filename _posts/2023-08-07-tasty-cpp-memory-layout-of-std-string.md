@@ -4,11 +4,11 @@ author: Oleksandr Gituliar
 date: 2023-08-07
 title: "Tasty C++ – Memory Layout of std::string"
 description:
-  "About memory layout of std::string in the most popular c++ standard libraries: MSVC STL,
-  GCC libstdc++, LLVM libc++."
-image: /static/img/2023-08-07/og-image.png
+  "About memory layout of std::string in the most popular c++ standard libraries: MSVC STL, GCC
+  libstdc++, LLVM libc++."
+image: /assets/img/2023-08-07/og-image.png
 seo:
-  date_modified: 2023-08-13
+  date_modified: 2023-08-14
 ---
 
 For a professional C++ developer, it's important to understand memory organization of the data
@@ -16,9 +16,9 @@ structures, especially when it comes to the containers from the C++ Standard Lib
 of Tasty C++ series we'll look inside of `std::string`, so that you can more effectively work with
 C++ strings and take advantage and avoid pitfalls of the C++ Standard Library you are using.
 
-In C++ Standard Library, `std::string` is one of the three [contiguous
-containers](https://en.cppreference.com/w/cpp/named_req/ContiguousContainer) (together with
-`std::array` and `std::vector`). This means that a sequence of characters is stored in a
+In C++ Standard Library, `std::string` is one of the three
+[contiguous containers](https://en.cppreference.com/w/cpp/named_req/ContiguousContainer) (together
+with `std::array` and `std::vector`). This means that a sequence of characters is stored in a
 _contiguous_ area of the memory and an individual character can be efficiently accessed by its index
 at O(1) time. The C++ Standard imposes more requirements on the complexity of string operations,
 which we will briefly focus on later in this post.
@@ -97,11 +97,11 @@ fundamental types such as `void *`, `size_t`, or `double`). This technique is po
 implementations, however is not a part of the C++ Standard.
 
 Now it makes sense why some implementations increase the auxiliary region to 32 bytes --- to store
-longer _small strings_ in the auxiliary region before switching into the regular mode with dynamically
-allocated buffer.
+longer _small strings_ in the auxiliary region before switching into the regular mode with
+dynamically allocated buffer.
 
-**How big are small strings?** Let's see how many characters the auxiliary region can store.
-This is what `std::string().capacity()` will tell us:
+**How big are small strings?** Let's see how many characters the auxiliary region can store. This is
+what `std::string().capacity()` will tell us:
 
 | C++ Standard Library | Small String Capacity |
 | -------------------- | --------------------- |
@@ -127,14 +127,14 @@ various standard libraries:
 
 | Example                                                             | GCC libstdc++                                                            |
 | ------------------------------------------------------------------- | ------------------------------------------------------------------------ |
-| ![string size C++ code](/static/img/2023-08-07/string-size-src.png) | ![string size GCC assembler](/static/img/2023-08-07/string-size-gcc.png) |
+| ![string size C++ code](/assets/img/2023-08-07/string-size-src.png) | ![string size GCC assembler](/assets/img/2023-08-07/string-size-gcc.png) |
 
 **LLVM libc++**. The function at first checks if the string is short and then calculates its size
 (see <https://godbolt.org/z/xM349cG5P>).
 
 | Example                                                             | LLVM libc++                                                                |
 | ------------------------------------------------------------------- | -------------------------------------------------------------------------- |
-| ![string size C++ code](/static/img/2023-08-07/string-size-src.png) | ![string size LLVM assembler](/static/img/2023-08-07/string-size-llvm.png) |
+| ![string size C++ code](/assets/img/2023-08-07/string-size-src.png) | ![string size LLVM assembler](/assets/img/2023-08-07/string-size-llvm.png) |
 
 LLVM code remains more complex for other methods too. It's hard to say how badly this impacts the
 overall performance. The best advice is to keep this knowledge at hand and, for your particular use
@@ -145,9 +145,10 @@ case, benchmark and experiment with various implementations.
 Finally, let's come back to a long string mode and see how `m_buffer` grows when our string becomes
 bigger. Some
 [comments](https://github.com/gcc-mirror/gcc/blob/master/libstdc%2B%2B-v3/include/bits/basic_string.tcc#L142)
-in the GCC source code, refer to the _exponential growth policy_. It's not clear if this is an internal
-GCC decision or part of the C++ Standard. In any case, all three implementations use exponential
-growth, so that **MSVC** has **1.5x factor** growth, while **GCC** and **LLVM** use **2x factor**.
+in the GCC source code, refer to the _exponential growth policy_. It's not clear if this is an
+internal GCC decision or part of the C++ Standard. In any case, all three implementations use
+exponential growth, so that **MSVC** has **1.5x factor** growth, while **GCC** and **LLVM** use **2x
+factor**.
 
 The code below illustrates the growth algorithm in each implementation. The capacity examples show
 how the capacity changes as the string grows one character at a time in a loop:

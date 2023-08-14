@@ -60,7 +60,7 @@ crosscheck.
   <figcaption>This is my caption text.</figcaption>
 </figure> -->
 
-![CPU vs GPU performance plot](/static/img/fd1d-gpu-b550.png)
+![CPU vs GPU performance plot](/assets/img/fd1d-gpu-b550.png)
 
 In the plot above, every bin is an average over 8 consequitive batch runs, such that
 

@@ -2,7 +2,7 @@ author: "Oleksandr Gituliar"
 url: "https://tastycode.dev" # the base hostname & protocol for your site, e.g. http://example.com
 baseurl: "/" # the subpath of your site, e.g. /blog
 title: "TastyCode"
-logo: "/static/img/logo-xl.png"
+logo: "/assets/img/logo-xl.png"
 
 defaults:
   - scope:
