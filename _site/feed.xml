@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="4.3.2">Jekyll</generator><link href="https://tastycode.dev/feed.xml" rel="self" type="application/atom+xml" /><link href="https://tastycode.dev/" rel="alternate" type="text/html" /><updated>2023-08-14T23:23:59+02:00</updated><id>https://tastycode.dev/feed.xml</id><title type="html">TastyCode</title><author><name>Oleksandr Gituliar</name></author><entry><title type="html">Tasty C++ – Memory Layout of std::string</title><link href="https://tastycode.dev/blog/tasty-cpp-memory-layout-of-std-string" rel="alternate" type="text/html" title="Tasty C++ – Memory Layout of std::string" /><published>2023-08-07T00:00:00+02:00</published><updated>2023-08-07T00:00:00+02:00</updated><id>https://tastycode.dev/blog/tasty-cpp-memory-layout-of-std-string</id><content type="html" xml:base="https://tastycode.dev/blog/tasty-cpp-memory-layout-of-std-string"><![CDATA[<p>For a professional C++ developer, it’s important to understand memory organization of the data
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="4.3.2">Jekyll</generator><link href="https://tastycode.dev/feed.xml" rel="self" type="application/atom+xml" /><link href="https://tastycode.dev/" rel="alternate" type="text/html" /><updated>2023-08-16T08:17:59+02:00</updated><id>https://tastycode.dev/feed.xml</id><title type="html">TastyCode</title><author><name>Oleksandr Gituliar</name></author><entry><title type="html">Tasty C++ – Memory Layout of std::string</title><link href="https://tastycode.dev/blog/tasty-cpp-memory-layout-of-std-string" rel="alternate" type="text/html" title="Tasty C++ – Memory Layout of std::string" /><published>2023-08-07T00:00:00+02:00</published><updated>2023-08-07T00:00:00+02:00</updated><id>https://tastycode.dev/blog/tasty-cpp-memory-layout-of-std-string</id><content type="html" xml:base="https://tastycode.dev/blog/tasty-cpp-memory-layout-of-std-string"><![CDATA[<p>For a professional C++ developer, it’s important to understand memory organization of the data
 structures, especially when it comes to the containers from the C++ Standard Library. In this post
 of Tasty C++ series we’ll look inside of <code class="language-plaintext highlighter-rouge">std::string</code>, so that you can more effectively work with
 C++ strings and take advantage and avoid pitfalls of the C++ Standard Library you are using.</p>
@@ -39,7 +39,7 @@ data fields:</p>
 
 <p>This representation takes <em>24 bytes</em> and is very close to the production code.</p>
 
-<p>Let’s see how this compares to the <strong>actualjj size</strong> of <code class="language-plaintext highlighter-rouge">std::string</code>. This is given by
+<p>Let’s see how this compares to the <strong>actual size</strong> of <code class="language-plaintext highlighter-rouge">std::string</code>. This is given by
 <code class="language-plaintext highlighter-rouge">sizeof(std::string)</code> and in the most popular implementations of the C++ Standard Library is the
 following:</p>
 
@@ -95,11 +95,11 @@ and (2) allocating a buffer for a new, even small, copy of the string. -->
 heap. However, when the actual data is small enough, it seems inefficient to reserve 24 or 32 bytes
 for the auxiliary data, isn’t it?</p>
 
-<p><strong>Small String Optimization.</strong> This is what the <em>small string optimization</em> (aka SSO) if used for.
+<p><strong>Small String Optimization.</strong> This is what the <em>small string optimization</em> (aka SSO) is used for.
 The idea is to store the actual data in the auxiliary region with no need to allocate the buffer on
-the heap, that makes <code class="language-plaintext highlighter-rouge">std::string</code> cheap to copy and construct (as it’s only 3x-4x time bigger than
+the heap, that makes <code class="language-plaintext highlighter-rouge">std::string</code> cheap to copy and construct (as it’s only 3x-4x times more than
 fundamental types such as <code class="language-plaintext highlighter-rouge">void *</code>, <code class="language-plaintext highlighter-rouge">size_t</code>, or <code class="language-plaintext highlighter-rouge">double</code>). This technique is popular among various
-implementations, however is not a part of the C++ Standard.</p>
+implementations, but is not a part of the C++ Standard.</p>
 
 <p>Now it makes sense why some implementations increase the auxiliary region to 32 bytes — to store
 longer <em>small strings</em> in the auxiliary region before switching into the regular mode with
