@@ -1,21 +1,74 @@
 ---
 layout: post
 author: Oleksandr Gituliar
-title: "Tasty Quant – Finite Difference with GPU"
+title: "Tasty Quant – Benefits of Pricing Derivatives with GPU"
 ---
 
-When it comes to pricing derivatives, there are two universal methods adopted by the industry
-capable to deal with a wide range of products. The first one is the famous **Monte-Carlo** method.
-Another one is the **Finite-Difference** method, which we will focus on in this post today.
+After five years working as a quant, I can tell that the wast majority of derivative pricing in the
+financial industry is done on CPU. This is easily explained by two facts: (1) no GPU was available
+when banks started developing their pricing analytics in 90's; and (2) banking is a conservative
+business/sector, slow to upgrade to a new stack when main business works as usual (hence Cobol and
+mainfraims are still very common).
 
-What I'd like to share with you are the results of my experiment of porting a finite-difference
-pricer from CPU to GPU. Since benchmarks look interesting and overall this sort of projects are not
-very common on the web, I think it would be nice to share it with a wider audience.
+This post is my benchmark of pricing American Options with a finite-difference method on CPU vs GPU.
+My main focus is on two things:
 
-**Source code** is here: <https://github.com/gituliar/kwinto-cuda>. It should be easy to compile on
-Linux or Windows and run your own benchmark if you have Nvidia GPU.
+- How much _faster_ is GPU vs CPU? <br/>
+  Speed is a convenient metric to compare performance, as faster usually means better (given all
+  other factors equal).
+- How much _cheaper_ is GPU vs CPU? <br/>
+  Budget is always essential when making decisions in a bank. Speed is important, as fast code eats
+  less CPU hours, but there are also other factors worth to discuss.
 
-## CPU vs GPU
+<!-- ![image](/assets/img/2023-08-22/og-image.png) -->
+
+When it comes to pricing derivatives, there are two methods, widely-adopted by the industry,
+that are capable to solve a wide range of problems. The first one is the famous **Monte-Carlo**
+method. Another one is the **Finite-Difference** method, which we will focus on in this post today.
+
+**Source code**: <https://github.com/gituliar/kwinto-cuda>. You should be able to run it on Linux or
+Windows (Nvidia GPU is required).
+
+## Benchmark
+
+My approach is to price american options in batches. This is usually how things are run in
+production, when risk-managing trading books. Every batch (or portfolio) contains from 256 to 16'384
+american options.
+
+The total pool of options is constructed by permuting all combinations of the following parameters
+(with filtering out options cheaper than 0.5):
+
+| Parameter     | Range                                        |
+| ------------- | -------------------------------------------- |
+| Parity        | PUT                                          |
+| Strike        | 100                                          |
+| Spot          | 25, 50, 80, 90, 100, 110, 120, 150, 175, 200 |
+| Maturity      | 1/12, 0.25, 0.5, 0.75, 1.0                   |
+| Volatility    | 0.1, 0.2, 0.3, 0.4, 0.5, 0.6                 |
+| Interest rate | 2%, 4%, 6%, 8%, 10%                          |
+| Dividend rate | 0%, 4%, 8%, 12%                              |
+
+For this project, American options are good candidates for several reasons:
+
+1.  No analytical formula exist to price American options (similar to the Black-Scholes-Merton
+    formula for European options), which doesn't make the code artificial / for-benchmark-only.
+2.  Since recently, a highly-accurate and fast method to price American options became available,
+    (see Andersen et al. \[1\]). We use its implementation from the QuantLib for a crosscheck.
+3.  Thirdly, the code can be extended to price exotic options for which no fast method exist.
+
+<!-- <figure>
+  <img src="/img/fd1d-gpu-z800.png"/>
+  <figcaption>This is my caption text.</figcaption>
+</figure> -->
+
+In the plot below, every bin is an average over 8 consequitive batch runs, such that
+
+![Benchmark CPU vs GPU](/assets/img/2023-08-22/bench-512-cpu-gpu.png)
+
+Let's postpone to discuss these results for the summary. Now, we'd better get more confidence in the
+option prices we've generated for benchmarking.
+
+## Other Factors
 
 At first, let's take a look what theoretical benefits we can expect by switching to GPU.
 
@@ -43,33 +96,15 @@ At first, let's take a look what theoretical benefits we can expect by switching
 
 It's time to run some benchmarks to see how these theoretical arguments relate with practice.
 
-## Benchmark
+### Old CPU + Same GPU
 
-For benchmarking, we'll price american options in batches. This is usually how things are run in
-practice when risk managing real trading books. Every batch (or portfolio) contains from 256 to
-16'384 options, all different.
+![Benchmark CPU vs GPU](/assets/img/2023-08-22/bench-z800.png)
 
-American options are good candidates for this exercise for two reasons. First, there is no
-analytical formula for the price of American options, similar to the Black-Scholes-Merton formula
-for European options. Second, since recently there is a highly-accurate (and fast) method available
-for pricing American options, developed by Andersen et al. \[1\], which we'll employ as a
-crosscheck.
-
-<!-- <figure>
-  <img src="/img/fd1d-gpu-z800.png"/>
-  <figcaption>This is my caption text.</figcaption>
-</figure> -->
-
-![CPU vs GPU performance plot](/assets/img/fd1d-gpu-b550.png)
-
-In the plot above, every bin is an average over 8 consequitive batch runs, such that
-
-- Every **CPU batch** is run in a single thread (so, account for _theoretical speedup_ of 12x for
-  Ryzen 9 X5900 when run on multiple cores).
-- Every **GPU batch** is run on all available GPU cores.
-
-Let's postpone to discuss these results for the summary. Now, we'd better get more confidence in the
-option prices we've generated for benchmarking.
+On another image you can see how the same algorithm performs on a much older hardware from 20xx.
+What immediately catches the eye is that the new Ryzen 9 outperforms the old Xeon. This is something
+we expect and is not a surprise. However, surprising is that GPU performs equally well on both
+machines. In practice, this reduces operational costs by eliminating the need to replace CPU platform every N
+years.
 
 ## Crossheck
 
@@ -109,14 +144,14 @@ As we saw at the beginning, a single GPU card is about **4x cheaper** to run tha
 already a big benefit on the start. The question is whether it's faster or at least not that much
 slower.
 
-Next, **10x speedup** comes from the number of cores GPU contains. This is not 100x as we expected
+Next, **2x speedup** comes from the number of cores GPU contains. This is not 100x as we expected
 from theory, but still a considerable gain.
 
 Finally, instead of expected 32x speedup by switching from `double` to `float` we get only **2x
 gain**. This is very likely due to that main bottleneck is not computation itself but data transfer
 (as float-grid is 2x smaller than double-grid).
 
-Final verdict: GPU is at least **5x faster / cheaper** than CPU to price with finite-difference.
+Final verdict: GPU is **20x cheaper** to price with finite-difference than CPU.
 
 ## References
 

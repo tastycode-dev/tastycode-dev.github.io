@@ -15,6 +15,8 @@ title: "Notes"
 
 ## Tasty C++
 
+- Inter-Process Communication using Shared Code
+
 - `DateTime` + `Duration` classes
 
 - Parser for Option Symbols (based on small user-defined strings ?)
