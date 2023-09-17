@@ -51,7 +51,7 @@ class TastyString {
 
 This representation takes _24 bytes_ and is very close to the production code.
 
-Let's see how this compares to the **actualjj size** of `std::string`. This is given by
+Let's see how this compares to the **actual size** of `std::string`. This is given by
 `sizeof(std::string)` and in the most popular implementations of the C++ Standard Library is the
 following:
 
@@ -90,11 +90,11 @@ _auxiliary data_, while the _actual data_ (characters) is stored in the buffer a
 heap. However, when the actual data is small enough, it seems inefficient to reserve 24 or 32 bytes
 for the auxiliary data, isn't it?
 
-**Small String Optimization.** This is what the _small string optimization_ (aka SSO) if used for.
+**Small String Optimization.** This is what the _small string optimization_ (aka SSO) is used for.
 The idea is to store the actual data in the auxiliary region with no need to allocate the buffer on
-the heap, that makes `std::string` cheap to copy and construct (as it's only 3x-4x time bigger than
+the heap, that makes `std::string` cheap to copy and construct (as it's only 3x-4x times more than
 fundamental types such as `void *`, `size_t`, or `double`). This technique is popular among various
-implementations, however is not a part of the C++ Standard.
+implementations, but is not a part of the C++ Standard.
 
 Now it makes sense why some implementations increase the auxiliary region to 32 bytes --- to store
 longer _small strings_ in the auxiliary region before switching into the regular mode with
