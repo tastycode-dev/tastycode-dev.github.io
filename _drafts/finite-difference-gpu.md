@@ -35,3 +35,8 @@ maximum (MAE / MRE) absolute / relative errors.
 | MRE   | 1.1e-3  | 1.1e-3  | 1.1e-3  | 1.1e-3  |
 
 See Andersen et al where they compare the same portfolio with various other methods.
+
+## References
+
+<https://hpcquantlib.wordpress.com/2022/10/09/high-performance-american-option-pricing> by Klaus
+Spanderen

@@ -1,7 +1,7 @@
 ---
 layout: post
 author: Oleksandr Gituliar
-title: "Tasty Quant – Benefits of Pricing Derivatives with GPU"
+title: "Tasty Quant – Benefits of Pricing American Options with GPU"
 ---
 
 After five years working as a quant, I can tell that the wast majority of derivative pricing in the
@@ -10,14 +10,17 @@ when banks started developing their pricing analytics in 90's; and (2) banking i
 business/sector, slow to upgrade to a new stack when main business works as usual (hence Cobol and
 mainfraims are still very common).
 
-In this post, I benchmark pricing of American Options on CPU vs GPU. Since no analytical formula
-exist to price American options (similar to the Black-Scholes formula for European options), people
-in banks use numerical methods, which are computationally greedy.
+**American Options.** In this post, I benchmark pricing of American Options on CPU vs GPU. Since no
+analytical formula exist to price American options (similar to the Black-Scholes formula for
+European options), people in banks use numerical methods, which are computationally greedy.
 
-For the benchmark, I use my implementation of the _finite-difference method_, which deserves a
-dedicated post. It's written in C++ / CUDA and is available at
-<https://github.com/gituliar/kwinto-cuda>. You should be able to run this code on a Linux or Windows
-machine (with Nvidia GPU).
+**Finite Difference.** For the benchmark, I use my own implementations of the [finite-difference
+method](https://en.wikipedia.org/wiki/Finite_difference_method) for CPU and GPU.
+_[mention MC and Andersen]_
+American options Pricing: "High-Performance American Option Pricing" by Andersen, Lake, Offengenden
+
+**Source Code.** C++ / CUDA code is available at <https://github.com/gituliar/kwinto-cuda>. You
+should be able to run it on a Linux or Windows machine (with Nvidia GPU). _[, which deserves a dedicated post]_
 
 My main focus is on two things:
 
@@ -66,8 +69,8 @@ For this project, American options are good candidates for several reasons:
   <figcaption>This is my caption text.</figcaption>
 </figure> -->
 
-Below are the main results. Each bin shows how many options are priced per second (hence, higher is
-better) and is an average across 8 consecutive batch runs.
+**Results.** Below are the main results. Each bin shows how many options are priced per second
+(hence, higher is better) and is an average across 8 consecutive batch runs.
 
 ![Benchmark CPU vs GPU](/assets/img/2023-08-22/bench-512-cpu-gpu.png)
 
@@ -127,11 +130,4 @@ Finally, instead of expected 32x speedup by switching from `double` to `float` w
 gain**. This is very likely due to that main bottleneck is not computation itself but data transfer
 (as float-grid is 2x smaller than double-grid).
 
-Final verdict: GPU is **20x cheaper** to price with finite-difference than CPU.
-
-## References
-
-<https://hpcquantlib.wordpress.com/2022/10/09/high-performance-american-option-pricing> by Klaus
-Spanderen
-
-American options Pricing: "High-Performance American Option Pricing" by Andersen, Lake, Offengenden
+**Final verdict.** GPU is **20x cheaper** to price with finite-difference than CPU.
