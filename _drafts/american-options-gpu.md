@@ -10,33 +10,38 @@ when banks started developing their pricing analytics in 90's; and (2) banking i
 business/sector, slow to upgrade to a new stack when main business works as usual (hence Cobol and
 mainfraims are still very common).
 
-This post is my benchmark of pricing American Options with a finite-difference method on CPU vs GPU.
+In this post, I benchmark pricing of American Options on CPU vs GPU. Since no analytical formula
+exist to price American options (similar to the Black-Scholes formula for European options), people
+in banks use numerical methods, which are computationally greedy.
+
+For the benchmark, I use my implementation of the _finite-difference method_, which deserves a
+dedicated post. It's written in C++ / CUDA and is available at
+<https://github.com/gituliar/kwinto-cuda>. You should be able to run this code on a Linux or Windows
+machine (with Nvidia GPU).
+
 My main focus is on two things:
 
 - How much _faster_ is GPU vs CPU? <br/>
   Speed is a convenient metric to compare performance, as faster usually means better (given all
   other factors equal).
 - How much _cheaper_ is GPU vs CPU? <br/>
-  Budget is always essential when making decisions in a bank. Speed is important, as fast code eats
-  less CPU hours, but there are also other factors worth to discuss.
+  Budget is always essential when making decisions in a company. Speed is important, as fast code
+  means less CPU hours, but there are also other factors worth to discuss.
 
 <!-- ![image](/assets/img/2023-08-22/og-image.png) -->
 
-When it comes to pricing derivatives, there are two methods, widely-adopted by the industry,
-that are capable to solve a wide range of problems. The first one is the famous **Monte-Carlo**
+When it comes to pricing derivatives, there are two methods, widely-adopted by the industry, that
+are capable to solve a wide range of pricing problems. The first one is the famous **Monte-Carlo**
 method. Another one is the **Finite-Difference** method, which we will focus on in this post today.
-
-**Source code**: <https://github.com/gituliar/kwinto-cuda>. You should be able to run it on Linux or
-Windows (Nvidia GPU is required).
 
 ## Benchmark
 
-My approach is to price american options in batches. This is usually how things are run in
-production, when risk-managing trading books. Every batch (or portfolio) contains from 256 to 16'384
-american options.
+My approach is to price american options in batches. This is usually how things are run in banks,
+for risk-managing trading books. Every batch contains from 256 to 16'384 american options, which are
+priced in parallel.
 
 The total pool of options is constructed by permuting all combinations of the following parameters
-(with filtering out options cheaper than 0.5):
+(with options cheaper than 0.5 rejected). In total this gives XYZ options.
 
 | Parameter     | Range                                        |
 | ------------- | -------------------------------------------- |
@@ -61,82 +66,53 @@ For this project, American options are good candidates for several reasons:
   <figcaption>This is my caption text.</figcaption>
 </figure> -->
 
-In the plot below, every bin is an average over 8 consequitive batch runs, such that
+Below are the main results. Each bin shows how many options are priced per second (hence, higher is
+better) and is an average across 8 consecutive batch runs.
 
 ![Benchmark CPU vs GPU](/assets/img/2023-08-22/bench-512-cpu-gpu.png)
 
-Let's postpone to discuss these results for the summary. Now, we'd better get more confidence in the
-option prices we've generated for benchmarking.
+Few things to pay attention here:
 
-## Other Factors
+1. **GPU is 2x faster.** This is true for a single-precision FP32 mode only, however accuracy
+   is good enough to use this mode in production.
+   For example, my Nvidia GTX 1070 has 1920 cores vs 12 cores on my AMD Ryzen 9 X5900, this is 160x
+   more cores. Of course, GPU cores are less powerful and run at lower frequency. But still, a
+   perspective of at least 10x speedup seems realistic.
+2. **GPU is 4-years older.** This is a considerable gap in the hardware world:
+   - [Nvidia GTX 1070](https://www.techpowerup.com/gpu-specs/geforce-gtx-1070.c2840) was released in
+     Jun'16.
+   - [AMD Ryzen 9 X5900](https://www.techpowerup.com/cpu-specs/ryzen-9-5900x.c2363) was released in
+     Nov'20.
+3. GPU is most effective for big batches (4096 options and more).
 
-At first, let's take a look what theoretical benefits we can expect by switching to GPU.
+## Budget
 
-- First of all, $$$, a **GPU is cheap**.
+**GPU is cheap**. Let's talks about $$$ now.
+
+- Cheap to buy.
 
   In Apr'23, on a secondary market in Denmark I paid $250 for the AMD Ryzen 9 X5900 and only $120
   for Nvidia GTX 1070. Remeber, that you can run multiple GPUs on a single motherboard (up to 20 on
   crypto-mining motherboards). Finally, keep in mind that to run an extra CPU it requires an another
-  motherboard, RAM, HDD -- essentially a whole new machine (not counting for devops work to connect
-  all them into a network, keep it up, manage software, etc.).
+  motherboard, RAM, HDD -- essentially a whole new machine.
 
-  All this easily gives extra 3-5x advantage in favour of GPU to start with.
+- Cheap to run.
 
-- On average, a **GPU has ~100x more cores** than a CPU.
+  Less hardware = lower operational cost for hardware and staff. (not counting for devops work to
+  connect them into a network, manage software updates, etc.)
 
-  For example, my Nvidia GTX 1070 has 1920 cores vs 12 cores on my AMD Ryzen 9 X5900, this is 160x
-  more cores. Of course, GPU cores are less powerful and run at lower frequency. But still, a
-  perspective of at least 10x speedup seems realistic.
+- Cheap to upgrade.
 
-- On average, a **GPU has 32x more single-precision units** than double-precision units, also known
-  as Arithmetic Logic Units (ALU).
+  On another image you can see how the same algorithm performs on a much older hardware from 20xx.
 
-  In theory, this means 32x more operations per second by simply switching from `double` to `float`.
-  Too good to be true for such a trivial change, hence worth to check on practice.
+  ![Benchmark CPU vs GPU](/assets/img/2023-08-22/bench-z800.png)
 
-It's time to run some benchmarks to see how these theoretical arguments relate with practice.
+  What immediately catches the eye is that the new Ryzen 9 outperforms the old Xeon. This is something
+  we expect and is not a surprise. However, surprising is that GPU performs equally well on both
+  machines. In practice, this reduces operational costs by eliminating the need to replace CPU platform every N
+  years.
 
-### Old CPU + Same GPU
-
-![Benchmark CPU vs GPU](/assets/img/2023-08-22/bench-z800.png)
-
-On another image you can see how the same algorithm performs on a much older hardware from 20xx.
-What immediately catches the eye is that the new Ryzen 9 outperforms the old Xeon. This is something
-we expect and is not a surprise. However, surprising is that GPU performs equally well on both
-machines. In practice, this reduces operational costs by eliminating the need to replace CPU platform every N
-years.
-
-## Crossheck
-
-Obviously, it doesn't make sense to benchmark the wrong code. To ensure that my code is correct, I
-compare the results by pricing a portfolio of 4'495 American put options against a highly-accurate
-algorithm of Andersen et al. Its implementation by Klaus Spanderen is available in QuantLib, see his
-blog for more details \[2\]. Thank you Klaus for your contribution!
-
-In fact, this is the same portfolio used in \[1\], constructed of options by permuting all
-combinations of the following parameters (with filtering out options cheaper than 0.5):
-
-| Parameter                   | Range                                        |
-| --------------------------- | -------------------------------------------- |
-| **k** -- strike             | 100                                          |
-| **s** -- spot               | 25, 50, 80, 90, 100, 110, 120, 150, 175, 200 |
-| **t** -- time to maturity   | 1/12, 0.25, 0.5, 0.75, 1.0                   |
-| **z** -- implied volatility | 0.1, 0.2, 0.3, 0.4, 0.5, 0.6                 |
-| **r** -- interest rate      | 2%, 4%, 6%, 8%, 10%                          |
-| **q** -- dividend rate      | 0%, 4%, 8%, 12%                              |
-| **w** -- parity             | PUT                                          |
-
-In the table below are the crosscheck results, which contain root-mean-square (RMSE / RRMSE) and
-maximum (MAE / MRE) absolute / relative errors.
-
-|       | CPU x32 | CPU x64 | GPU x32 | GPU x64 |
-| ----- | ------- | ------- | ------- | ------- |
-| RMSE  | 20.7e-4 | 5.4e-4  | 15.8e-4 | 5.4e-4  |
-| RRMSE | 9.9e-5  | 8.1e-5  | 9.1e-5  | 8.1e-5  |
-| MAE   | 23.7e-3 | 4.3e-3  | 25.1e-3 | 4.3e-3  |
-| MRE   | 1.1e-3  | 1.1e-3  | 1.1e-3  | 1.1e-3  |
-
-See Andersen et al where they compare the same portfolio with various other methods.
+All this easily gives extra 3-5x advantage in favour of GPU to start with.
 
 ## Summary
 
