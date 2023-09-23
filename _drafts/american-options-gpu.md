@@ -1,7 +1,7 @@
 ---
 layout: post
 author: Oleksandr Gituliar
-title: "Tasty Quant – Benefits of Pricing American Options with GPU"
+title: "Tasty GPU – Cheaper Prices of American Options"
 ---
 
 After five years working as a quant, I can tell that the wast majority of derivative pricing in the
@@ -10,17 +10,20 @@ when banks started developing their pricing analytics in 90's; and (2) banking i
 business/sector, slow to upgrade to a new stack when main business works as usual (hence Cobol and
 mainfraims are still very common).
 
-**American Options.** In this post, I benchmark pricing of American Options on CPU vs GPU. Since no
+**American Options.** In this post, I benchmark pricing of American Options on GPU. Since no
 analytical formula exist to price American options (similar to the Black-Scholes formula for
-European options), people in banks use numerical methods, which are computationally greedy.
+European options), people in banks use numerical methods to solve this sort of problems. Such
+methods are computationally greedy and require lots of hardware to risk-manage thousands of trades
+in trading books.
 
 **Finite Difference.** For the benchmark, I use my own implementations of the [finite-difference
 method](https://en.wikipedia.org/wiki/Finite_difference_method) for CPU and GPU.
 _[mention MC and Andersen]_
 American options Pricing: "High-Performance American Option Pricing" by Andersen, Lake, Offengenden
 
-**Source Code.** C++ / CUDA code is available at <https://github.com/gituliar/kwinto-cuda>. You
-should be able to run it on a Linux or Windows machine (with Nvidia GPU). _[, which deserves a dedicated post]_
+**Source Code.** C++ / CUDA code is available on Github: <https://github.com/gituliar/kwinto-cuda>.
+You should be able to run it on a Linux or Windows machine (with Nvidia GPU). _[, which deserves a
+dedicated post]_
 
 My main focus is on two things:
 
@@ -90,30 +93,29 @@ Few things to pay attention here:
 
 ## Budget
 
-**GPU is cheap**. Let's talks about $$$ now.
+In the enterprise environment, _faster_ is almost always means _cheaper_. For example, an overnight
+job that takes 4 hours to calculate a risk report, might still take the same time, but half of the
+hardware resources if optimized to run 2x faster.
 
-- Cheap to buy.
+Speed is not the only factor that affects operational costs. Let's take a look at other factors.
 
-  In Apr'23, on a secondary market in Denmark I paid $250 for the AMD Ryzen 9 X5900 and only $120
-  for Nvidia GTX 1070. Remeber, that you can run multiple GPUs on a single motherboard (up to 20 on
-  crypto-mining motherboards). Finally, keep in mind that to run an extra CPU it requires an another
-  motherboard, RAM, HDD -- essentially a whole new machine.
+**Cheap to buy.** In Apr'23, on a secondary market in Denmark I paid $250 for the AMD Ryzen 9 X5900
+and only $120 for Nvidia GTX 1070. Remeber, that you can run multiple GPUs on a single motherboard
+(up to 20 on crypto-mining motherboards). Finally, keep in mind that to run an extra CPU it requires
+an another motherboard, RAM, HDD -- essentially a whole new machine.
 
-- Cheap to run.
+**Cheap to run.** Less hardware = lower operational cost and less staff. (not counting for devops
+work o connect them into a network, manage software updates, etc.) Many GPU on a single motherboard.
 
-  Less hardware = lower operational cost for hardware and staff. (not counting for devops work to
-  connect them into a network, manage software updates, etc.)
+**Cheap to upgrade.** Below is the same benchmark, but run on a much older [HP
+Z800](https://en.wikipedia.org/wiki/HP_Z) machine from 2009:
 
-- Cheap to upgrade.
+![Benchmark CPU vs GPU](/assets/img/2023-08-22/bench-z800.png)
 
-  On another image you can see how the same algorithm performs on a much older hardware from 20xx.
-
-  ![Benchmark CPU vs GPU](/assets/img/2023-08-22/bench-z800.png)
-
-  What immediately catches the eye is that the new Ryzen 9 outperforms the old Xeon. This is something
-  we expect and is not a surprise. However, surprising is that GPU performs equally well on both
-  machines. In practice, this reduces operational costs by eliminating the need to replace CPU platform every N
-  years.
+What immediately catches the eye is that the new Ryzen 9 outperforms the old Xeon. This is something
+we expect and is not a surprise. However, surprising is that GPU performs equally well on both
+machines. In practice, this reduces operational costs by eliminating the need to replace CPU platform every N
+years.
 
 All this easily gives extra 3-5x advantage in favour of GPU to start with.
 
