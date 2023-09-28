@@ -44,20 +44,24 @@ method. Another one is the **Finite-Difference** method, which we will focus on 
 
 My approach is to price american options in batches. This is usually how things are run in banks,
 for risk-managing trading books. Every batch contains from 256 to 16'384 american options, which are
-priced in parallel.
+priced in parallel utilizing all available cores on a CPU or GPU.
 
-The total pool of options is constructed by permuting all combinations of the following parameters
-(with options cheaper than 0.5 rejected). In total this gives XYZ options.
+The total pool of 378'000 options for the benchmark is constructed by permuting all combinations of
+the following parameters (with options cheaper than 0.5 rejected). Reference prices are calculated
+using the [high-performance pricing
+algorithm](https://hpcquantlib.wordpress.com/2022/10/09/high-performance-american-option-pricing/)
+implemented by Klaus Spanderen in QuantLib, see
+[portfolio.py](https://github.com/gituliar/kwinto-cuda/blob/main/test/portfolio.py) on GitHub.
 
-| Parameter     | Range                                        |
-| ------------- | -------------------------------------------- |
-| Parity        | PUT                                          |
-| Strike        | 100                                          |
-| Spot          | 25, 50, 80, 90, 100, 110, 120, 150, 175, 200 |
-| Maturity      | 1/12, 0.25, 0.5, 0.75, 1.0                   |
-| Volatility    | 0.1, 0.2, 0.3, 0.4, 0.5, 0.6                 |
-| Interest rate | 2%, 4%, 6%, 8%, 10%                          |
-| Dividend rate | 0%, 4%, 8%, 12%                              |
+| Parameter     | Range                                                                     |
+| ------------- | ------------------------------------------------------------------------- |
+| Parity        | PUT                                                                       |
+| Strike        | 100                                                                       |
+| Spot          | 25, 50, 80, 90, 100, 110, 120, 150, 175, 200                              |
+| Maturity      | 1/12, 0.25, 0.5, 0.75, 1.0, 1.25, 1.5, 1.75, 2.0                          |
+| Volatility    | 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0, 1.1, 1.2, 1.3, 1.4, 1.5 |
+| Interest rate | 1%, 2%, 3%, 4%, 5%, 6%, 7%, 8%, 9%, 10%                                   |
+| Dividend rate | 0%, 2%, 4%, 6%, 8%, 10%, 12%                                              |
 
 For this project, American options are good candidates for several reasons:
 
@@ -72,24 +76,34 @@ For this project, American options are good candidates for several reasons:
   <figcaption>This is my caption text.</figcaption>
 </figure> -->
 
-**Results.** Below are the main results. Each bin shows how many options are priced per second
-(hence, higher is better) and is an average across 8 consecutive batch runs.
+**Results.** Below are the main results. Each bin shows how many options are priced per second,
+so that higher is better.
 
 ![Benchmark CPU vs GPU](/assets/img/2023-08-22/bench-512-cpu-gpu.png)
 
-Few things to pay attention here:
+**US Options Market.**
+To give you some idea how the US option market look like, here are some numbers from
+[OPRA](https://www.opraplan.com):
 
-1. **GPU is 2x faster.** This is true for a single-precision FP32 mode only, however accuracy
-   is good enough to use this mode in production.
-   For example, my Nvidia GTX 1070 has 1920 cores vs 12 cores on my AMD Ryzen 9 X5900, this is 160x
-   more cores. Of course, GPU cores are less powerful and run at lower frequency. But still, a
-   perspective of at least 10x speedup seems realistic.
-2. **GPU is 4-years older.** This is a considerable gap in the hardware world:
+- 5'800 stocks
+- 680'000 options (delta in 5%-95% range)
+
+In other words, a $100 GPU, can **price entire US Options Market in just 2 min.**
+Obviously, this assumes that models are calibrated. And remember, the algorithm of Andersen et al.
+is much faster for this exercise.
+
+Few things to keep in mind when analyzing the plot:
+
+1. **GPU is 2x faster** in a single-precision FP32 mode only (with a good enough accuracy for
+   production). This is given that Nvidia GTX 1070 has 1920 cores vs 12 cores on AMD Ryzen 9 X5900.
+2. **GPU is 4 years older.** This is a considerable gap in the hardware world:
+
    - [Nvidia GTX 1070](https://www.techpowerup.com/gpu-specs/geforce-gtx-1070.c2840) was released in
      Jun'16.
    - [AMD Ryzen 9 X5900](https://www.techpowerup.com/cpu-specs/ryzen-9-5900x.c2363) was released in
      Nov'20.
-3. GPU is most effective for big batches (4096 options and more).
+
+3. **GPU loves big batches**, while CPU is most efficient for small jobs.
 
 ## Budget
 
@@ -97,27 +111,29 @@ In the enterprise environment, _faster_ is almost always means _cheaper_. For ex
 job that takes 4 hours to calculate a risk report, might still take the same time, but half of the
 hardware resources if optimized to run 2x faster.
 
-Speed is not the only factor that affects operational costs. Let's take a look at other factors.
+Speed is not the only factor that affects operational costs. Let's take a look at other factors that
+appeal in favour of GPU:
 
 **Cheap to buy.** In Apr'23, on a secondary market in Denmark I paid $250 for the AMD Ryzen 9 X5900
-and only $120 for Nvidia GTX 1070. Remeber, that you can run multiple GPUs on a single motherboard
-(up to 20 on crypto-mining motherboards). Finally, keep in mind that to run an extra CPU it requires
-an another motherboard, RAM, HDD -- essentially a whole new machine.
+and only $120 for Nvidia GTX 1070. To run an extra CPU it requires another motherboard, RAM, HDD --
+essentially a whole new machine. For a GPU you need an extra PCI-E slot only.
 
-**Cheap to run.** Less hardware = lower operational cost and less staff. (not counting for devops
-work o connect them into a network, manage software updates, etc.) Many GPU on a single motherboard.
+**Cheap to run.** A single motherboard can run multiple GPUs (up to 20 on crypto-mining
+motherboards). Less hardware = lower operational cost and less staff. No need to run a network,
+manage software updates on every machine, and hire an army of devops to automate all that.
 
-**Cheap to upgrade.** Below is the same benchmark, but run on a much older [HP
+**Cheap to upgrade.** PCI-E architecture is backward compatible and is upgraded not as often as CPU
+sockets. Below is the same benchmark run on a much older [HP
 Z800](https://en.wikipedia.org/wiki/HP_Z) machine from 2009:
 
 ![Benchmark CPU vs GPU](/assets/img/2023-08-22/bench-z800.png)
 
-What immediately catches the eye is that the new Ryzen 9 outperforms the old Xeon. This is something
-we expect and is not a surprise. However, surprising is that GPU performs equally well on both
-machines. In practice, this reduces operational costs by eliminating the need to replace CPU platform every N
-years.
+What immediately catches the eye is that Ryzen 9 outperforms the dual-Xeon setup. This is something
+we expect and is not a surprise. However, surprising is that **GPU performs equally well on the
+machine from 2009 and 2020**. In practice, this reduces operational costs by eliminating the need to
+replace CPU platform every 10 years.
 
-All this easily gives extra 3-5x advantage in favour of GPU to start with.
+All this easily gives extra 3-5x advantage in favour of GPU.
 
 ## Summary
 
