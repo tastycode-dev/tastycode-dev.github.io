@@ -7,7 +7,7 @@ description: Blog about programming and quantitative finance.
   {% for post in site.posts %}
     <li class="m-0 py-2">
       <a class="text-xl" href="{{ post.url }}">{{ post.title }}</a>
-      <time class="block text-sm">{{ post.date | date: site.my.date_format }}</time>
+      <time class="block text-sm post-subtitle">{{ post.date | date: site.my.date_format }}</time>
     </li>
   {% endfor %}
 </ul>

@@ -5,9 +5,25 @@
 @tailwind components;
 @tailwind utilities;
 
+/* @import "fira.css"; */
+
 @layer base {
+  @font-face {
+    font-family: "Fira Sans";
+    src: local("Fira Sans Regular"), url("/assets/font/fira/FiraSans-Regular.woff2") format("woff2");
+    font-weight: 400;
+    font-style: normal;
+  }
+
+  @font-face {
+    font-family: "Fira Mono";
+    src: local("Fira Mono"), url("/assets/font/fira/FiraMono-Regular.woff2") format("woff2");
+    font-weight: 400;
+    font-style: normal;
+  }
+
   html {
-    font-family: Arial, sans-serif;
+    font-family: "Fira Sans", Arial, sans-serif;
     font-size: 18px;
   }
 
@@ -30,7 +46,7 @@
 
   body {
     background-color: theme("colors.neutral.200");
-    font-family: Lato, sans-serif;
+    /* font-family: Lato, sans-serif; */
 
     color: theme("colors.neutral.800");
 
@@ -39,6 +55,15 @@
     max-width: 86ch;
 
     @apply px-8;
+  }
+
+  code,
+  kbd,
+  samp,
+  pre {
+    font-family: "Fira Mono", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas,
+      "Liberation Mono", "Courier New", monospace; /* 1 */
+    font-size: 1em; /* 2 */
   }
 
   figure {
@@ -111,6 +136,13 @@
   /* Leading Paragraph */
   .article-body > p:first-child {
     @apply leading-relaxed mt-0 mb-8 text-lg text-stone-800;
+  }
+
+  .post-subtitle {
+    color: #888;
+  }
+  .post-subtitle a {
+    color: #66f;
   }
 }
 

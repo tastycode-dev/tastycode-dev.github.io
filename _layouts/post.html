@@ -5,7 +5,7 @@ layout: base
 <article class="post h-entry" itemscope itemtype="http://schema.org/BlogPosting">
   <header class="post-header">
     <h1 class="post-title p-name" itemprop="name headline">{{ page.title | escape }}</h1>
-    <p class="mb-0">
+    <p class="mb-0 post-subtitle">
       {%- assign date_format = site.my.date_format | default: "%b %-d, %Y" -%}
       <time class="dt-published" datetime="{{ page.date | date_to_xmlschema }}" itemprop="datePublished">
         {{ page.seo.date_modified | default: page.date | date: date_format }}
@@ -18,7 +18,8 @@ layout: base
       </time>
       {%- endif -%}
       {%- if page.author -%}
-      • {% for author in page.author %}
+      —
+      {% for author in page.author %}
       <span itemprop="author" itemscope itemtype="http://schema.org/Person">
         <a href="/about" itemprop="name">{{ author }}</a></span>
       {%- if forloop.last == false %}, {% endif -%}
