@@ -26,12 +26,14 @@
 <link rel="canonical" href="https://tastycode.dev/blog/tasty-gpu-pricing-derivatives-on-a-budget" />
 <meta property="og:url" content="https://tastycode.dev/blog/tasty-gpu-pricing-derivatives-on-a-budget" />
 <meta property="og:site_name" content="TastyCode" />
+<meta property="og:image" content="https://tastycode.dev/assets/img/2023-10-01/bench-512-cpu-gpu.png" />
 <meta property="og:type" content="article" />
 <meta property="article:published_time" content="2023-10-01T00:00:00+02:00" />
-<meta name="twitter:card" content="summary" />
+<meta name="twitter:card" content="summary_large_image" />
+<meta property="twitter:image" content="https://tastycode.dev/assets/img/2023-10-01/bench-512-cpu-gpu.png" />
 <meta property="twitter:title" content="Tasty GPU – Pricing Derivatives on a Budget" />
 <script type="application/ld+json">
-{"@context":"https://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Oleksandr Gituliar"},"dateModified":"2023-10-01T00:00:00+02:00","datePublished":"2023-10-01T00:00:00+02:00","description":"After five years working as a quant, I can tell that the wast majority of derivative pricing in the financial industry is done on CPU. This is easily explained by two facts: (1) no GPU was available when banks started developing their pricing analytics in 90’s; and (2) banking is a conservative sector, slow to upgrade its technical stack.","headline":"Tasty GPU – Pricing Derivatives on a Budget","mainEntityOfPage":{"@type":"WebPage","@id":"https://tastycode.dev/blog/tasty-gpu-pricing-derivatives-on-a-budget"},"publisher":{"@type":"Organization","logo":{"@type":"ImageObject","url":"https://tastycode.dev/assets/img/logo-xl.png"},"name":"Oleksandr Gituliar"},"url":"https://tastycode.dev/blog/tasty-gpu-pricing-derivatives-on-a-budget"}</script>
+{"@context":"https://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Oleksandr Gituliar"},"dateModified":"2023-10-01T00:00:00+02:00","datePublished":"2023-10-01T00:00:00+02:00","description":"After five years working as a quant, I can tell that the wast majority of derivative pricing in the financial industry is done on CPU. This is easily explained by two facts: (1) no GPU was available when banks started developing their pricing analytics in 90’s; and (2) banking is a conservative sector, slow to upgrade its technical stack.","headline":"Tasty GPU – Pricing Derivatives on a Budget","image":"https://tastycode.dev/assets/img/2023-10-01/bench-512-cpu-gpu.png","mainEntityOfPage":{"@type":"WebPage","@id":"https://tastycode.dev/blog/tasty-gpu-pricing-derivatives-on-a-budget"},"publisher":{"@type":"Organization","logo":{"@type":"ImageObject","url":"https://tastycode.dev/assets/img/logo-xl.png"},"name":"Oleksandr Gituliar"},"url":"https://tastycode.dev/blog/tasty-gpu-pricing-derivatives-on-a-budget"}</script>
 <!-- End Jekyll SEO tag -->
 
 </head>
@@ -182,7 +184,7 @@ for pricing american options.</p>
 <p><strong>Results.</strong> A plot below depicts the main results. Each bin shows how many options are priced per
 second (higher is better):</p>
 
-<p><img src="/assets/img/2023-08-22/bench-512-cpu-gpu.png" alt="Benchmark CPU vs GPU" /></p>
+<p><img src="/assets/img/2023-10-01/bench-512-cpu-gpu.png" alt="Benchmark CPU vs GPU" /></p>
 
 <p><strong>US Options Market.</strong> To get some idea about how these results are useful in practice, let’s have a
 look at a size of the US options market. The data from <a href="https://www.opraplan.com">OPRA</a> tells that
@@ -246,7 +248,7 @@ machines, and hire an army of devops to automate all that.</p>
 <u>old machines</u>. Below is the same benchmark run on a much older machine with dual
 <a href="https://www.techpowerup.com/cpu-specs/xeon-x5675.c949">Xeon X5675</a> from 2011:</p>
 
-<p><img src="/assets/img/2023-08-22/bench-z800.png" alt="Benchmark CPU vs GPU" /></p>
+<p><img src="/assets/img/2023-10-01/bench-z800.png" alt="Benchmark CPU vs GPU" /></p>
 
 <p>What immediately catches the eye is that Ryzen 9 outperforms the dual-Xeon machine (both have equal
 number of physical cores, btw). This is not a surprise, given a 10-year technological gap.</p>
