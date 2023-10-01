@@ -39,7 +39,7 @@ time to cover this topic later.
   as faster usually means better (given all other factors equal).
 - How much <u>cheaper</u> is GPU vs CPU? <br/> Budget is always important when making decisions.
   Speed matters because fast code means less CPU time, but there are other essential factors worth
-  discussing that imact your budget.
+  discussing that impact your budget.
 
 ## Benchmark
 
@@ -115,7 +115,7 @@ Few things to keep in mind for the results above:
 ## Budget
 
 In the production environment, <u>faster</u> is almost always means <u>cheaper</u>. Speed is not the
-only factor that affects operational costs. Let's take a look at other factors that appeal in favour
+only factor that affects operational costs. Let's take a look at other factors that appeal in favor
 of GPU:
 
 <!-- **Cheap to setup.** In Apr'23, on a secondary market in Denmark I paid $250 for the AMD Ryzen 9
@@ -131,7 +131,7 @@ which is especially popular among crypto miners. Such a motherboard can handle <
 single machine</u>. In addition, there is no need to setup a network, manage software on various
 machines, and hire an army of devops to automate all that.
 
-This gives extra 3-5x cost reduction in favour of GPU.
+This gives extra 3-5x cost reduction in favor of GPU.
 
 **Cheap to upgrade.** PCI-E standard is backward compatible, so that new GPU cards are still run on
 <u>old machines</u>. Below is the same benchmark run on a much older machine with dual
@@ -156,4 +156,4 @@ financial industry. However, what is the benefit of running it on GPU ?
 - GPU is 2x faster
 - GPU is 3x-5x cheaper
 
-This combined gives <u>10x factor</u> in favour of GPU as a platform for pricing derivatives.
+This combined gives <u>10x factor</u> in favor of GPU as a platform for pricing derivatives.
