@@ -7,28 +7,33 @@ title: "Tasty GPU – Pricing Derivatives on a Budget"
 After five years working as a quant, I can tell that the wast majority of derivative pricing in the
 financial industry is done on CPU. This is easily explained by two facts: (1) no GPU was available
 when banks started developing their pricing analytics in 90's; and (2) banking is a conservative
-business/sector, slow to upgrade to a new stack when main business works as usual (hence Cobol and
-mainfraims are still very common).
+sector, slow to upgrade its technical stack.
 
 **American Options.** In this post, I benchmark pricing of American Options on GPU. Since no
 analytical formula exist to price American options (similar to the Black-Scholes formula for
 European options), people in banks use numerical methods to solve this sort of problems. Such
-methods are computationally greedy and require lots of hardware to risk-manage thousands of trades
-in trading books.
+methods are computationally greedy and, in practice, require a lot of hardware to risk-manage
+trading books with thousands of positions.
 
 **Finite Difference.** For the benchmark, I use my own implementations of the
 [finite-difference method](https://en.wikipedia.org/wiki/Finite_difference_method) for CPU and GPU.
-_[mention MC and Andersen]_ American options Pricing: "High-Performance American Option Pricing" by
-Andersen, Lake, Offengenden. When it comes to pricing derivatives, there are two methods,
-widely-adopted by the industry, that are capable to solve a wide range of pricing problems. The
-first one is the famous **Monte-Carlo** method. Another one is the **Finite-Difference** method,
-which we will focus on in this post today.
+When it comes to pricing derivatives, there are two methods, widely-adopted by the industry, that
+are capable to solve a wide range of pricing problems. The first one is the famous **Monte-Carlo**
+method. Another one is the **Finite-Difference** method, which we will focus on in this post today.
 
-**Source Code.** C++ / CUDA code is available on Github: <https://github.com/gituliar/kwinto-cuda>.
-You should be able to run it on a Linux or Windows machine (with Nvidia GPU). _[, which deserves a
-dedicated post]_
+Note, a <u>much faster method</u> to price American Options was recently developed by Andersen et
+al. (details below). This method has some constraints (like time-independent coefficients or
+log-normal underlying process) and is not a complete replacement for the finite-difference.
 
-**Main focus** is on two things:
+**Source Code.** The code is written in C++ / CUDA and is available on Github:
+<https://github.com/gituliar/kwinto-cuda>. It's compatible with Linux and Windows, but requires
+Nvidia GPU.
+
+The finite-difference algorithm itself is not very complicated, however deserves a <u>dedicated
+post</u> to be fully explained, as there are some nuances here and there. Hopefully, I'll find some
+time to cover this topic later.
+
+**Main focus** of the benchmarking is on the following:
 
 - How much <u>faster</u> is GPU vs CPU? <br/> Speed is a convenient metric to compare performance,
   as faster usually means better (given all other factors equal).
@@ -36,13 +41,11 @@ dedicated post]_
   Speed matters because fast code means less CPU time, but there are other essential factors worth
   discussing that imact your budget.
 
-<!-- ![image](/assets/img/2023-08-22/og-image.png) -->
-
 ## Benchmark
 
 My approach is to price american options <u>in batches</u>. This is usually how things are run in
 banks, when risk-managing trading books. Every batch contains from 256 to 16'384 american options,
-which are priced in parallel utilizing <u>all CPU or GPU cores</u>.
+which are priced in parallel utilizing <u>all cores</u> on CPU or GPU.
 
 The total pool of 378'000 options for the benchmark is constructed by permuting all combinations of
 the following parameters (with options cheaper than 0.5 rejected). <u>Reference prices</u> are
@@ -88,16 +91,16 @@ there are:
 - 5'800 stocks
 - 680'000 options (with 5%-95% delta)
 
-In other words, it takes **2 min to price** an entire US Options Market on a $100 GPU. It should
-take 10x longer for calibration, which is a more challenging task.
+In other words, as per the benchmark, it takes **2 min** to price an entire US Options Market on a
+$100 GPU. It should take 10x longer for calibration, which is a more challenging task.
 
-Few things to keep in mind for the plot above:
+Few things to keep in mind for the results above:
 
 1. **GPU is 2x faster** in a <u>single-precision</u> mode (gray bin) vs double-precision (yellow
    bin). Meantime, CPU performs more or less the same in both modes (blue and orange bins).
 
-   This is a clear sign that the GPU is limited by <u>data throughput</u>. In other words, with its
-   1'920 cores, the GPU processes data faster than loads it from the GPU memory.
+   This is a clear sign that the GPU is limited by <u>data throughput</u>. With its 1'920 cores, the
+   GPU processes data faster than loads it from the GPU memory.
 
 2. **GPU is 4 years older**, which is a big gap for hardware. Nevertheless, the oldish GPU is still
    faster than the modern CPU.
@@ -120,7 +123,7 @@ X5900 and only $120 for Nvidia GTX 1070. Obviously, <u>CPU requires</u> a mother
 whole machine -- so final price is 3x higher than that. <u>GPU requires</u> only a PCI-E slot. -->
 
 **Cheap to scale.** To run an <u>extra CPU</u> it requires a motherboard, RAM, HDD -- a whole new
-machine, which quickly becomes pricy at scale.
+machine, which quickly becomes expensive to scale.
 
 An <u>extra GPU</u>, however, requires only a PCI-E slot. Some motherboards offer a dozen PCI-E
 ports, like [ASRock Q270 Pro BTC+](https://www.asrock.com/mb/Intel/Q270%20Pro%20BTC+/index.asp),
@@ -128,32 +131,29 @@ which is especially popular among crypto miners. Such a motherboard can handle <
 single machine</u>. In addition, there is no need to setup a network, manage software on various
 machines, and hire an army of devops to automate all that.
 
+This gives extra 3-5x cost reduction in favour of GPU.
+
 **Cheap to upgrade.** PCI-E standard is backward compatible, so that new GPU cards are still run on
-old motherboards. Below is the same benchmark run on a much older machine with dual
+<u>old machines</u>. Below is the same benchmark run on a much older machine with dual
 [Xeon X5675](https://www.techpowerup.com/cpu-specs/xeon-x5675.c949) from 2011:
 
 ![Benchmark CPU vs GPU](/assets/img/2023-08-22/bench-z800.png)
 
-What immediately catches the eye is that Ryzen 9 outperforms the dual-Xeon setup (both have equal
-number of physical cores, btw). This is not a surprise, given a 10-year gap.
+What immediately catches the eye is that Ryzen 9 outperforms the dual-Xeon machine (both have equal
+number of physical cores, btw). This is not a surprise, given a 10-year technological gap.
 
-However, surprising is that a newer **GPU performs equally well** on a much older machine. In
-practice, this means that at some point in the future when GPU cards deserve an upgrade there is no
-need to upgrade other components, like CPU, motherboard, etc.
-
-All this easily gives extra 3-5x advantage in favour of GPU.
+Surprising is that a newer <u>GPU performs equally well</u> on a much older machine. In practice,
+this means that at some point in the future when GPU cards deserve an upgrade there is no need to
+upgrade other components, like CPU, motherboard, etc.
 
 ## Summary
 
-As we saw at the beginning, a single GPU card is about **4x cheaper** to run than CPU. This is
-already a big benefit on the start. The question is whether it's faster or at least not that much
-slower.
+The <u>Finite-Difference method</u> is a universal and powerful method, heavily used in the
+financial industry. However, what is the benefit of running it on GPU ?
 
-Next, **2x speedup** comes from the number of cores GPU contains. This is not 100x as we expected
-from theory, but still a considerable gain.
+**Final verdict.** My benchmark shows that:
 
-Finally, instead of expected 32x speedup by switching from `double` to `float` we get only **2x
-gain**. This is very likely due to that main bottleneck is not computation itself but data transfer
-(as float-grid is 2x smaller than double-grid).
+- GPU is 2x faster
+- GPU is 3x-5x cheaper
 
-**Final verdict.** GPU is **20x cheaper** to price with finite-difference than CPU.
+This combined gives <u>10x factor</u> in favour of GPU as a platform for pricing derivatives.
