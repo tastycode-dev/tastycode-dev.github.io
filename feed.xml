@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="4.3.2">Jekyll</generator><link href="https://tastycode.dev/feed.xml" rel="self" type="application/atom+xml" /><link href="https://tastycode.dev/" rel="alternate" type="text/html" /><updated>2023-10-01T10:15:32+02:00</updated><id>https://tastycode.dev/feed.xml</id><title type="html">TastyCode</title><author><name>Oleksandr Gituliar</name></author><entry><title type="html">Tasty GPU – Pricing Derivatives on a Budget</title><link href="https://tastycode.dev/blog/tasty-gpu-pricing-derivatives-on-a-budget" rel="alternate" type="text/html" title="Tasty GPU – Pricing Derivatives on a Budget" /><published>2023-10-01T00:00:00+02:00</published><updated>2023-10-01T00:00:00+02:00</updated><id>https://tastycode.dev/blog/tasty-gpu-pricing-derivatives-on-a-budget</id><content type="html" xml:base="https://tastycode.dev/blog/tasty-gpu-pricing-derivatives-on-a-budget"><![CDATA[<p>After five years working as a quant, I can tell that the wast majority of derivative pricing in the
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="4.3.2">Jekyll</generator><link href="http://localhost:4000/feed.xml" rel="self" type="application/atom+xml" /><link href="http://localhost:4000/" rel="alternate" type="text/html" /><updated>2023-10-01T11:10:11+02:00</updated><id>http://localhost:4000/feed.xml</id><title type="html">TastyCode</title><author><name>Oleksandr Gituliar</name></author><entry><title type="html">Tasty GPU – Pricing Derivatives on a Budget</title><link href="http://localhost:4000/blog/tasty-gpu-pricing-derivatives-on-a-budget" rel="alternate" type="text/html" title="Tasty GPU – Pricing Derivatives on a Budget" /><published>2023-10-01T00:00:00+02:00</published><updated>2023-10-01T00:00:00+02:00</updated><id>http://localhost:4000/blog/tasty-gpu-pricing-derivatives-on-a-budget</id><content type="html" xml:base="http://localhost:4000/blog/tasty-gpu-pricing-derivatives-on-a-budget"><![CDATA[<p>After five years working as a quant, I can tell that the wast majority of derivative pricing in the
 financial industry is done on CPU. This is easily explained by two facts: (1) no GPU was available
 when banks started developing their pricing analytics in 90’s; and (2) banking is a conservative
 sector, slow to upgrade its technical stack.</p>
@@ -192,7 +192,206 @@ financial industry. However, what is the benefit of running it on GPU ?</p>
   <li>GPU is 3x-5x cheaper</li>
 </ul>
 
-<p>This combined gives <u>10x factor</u> in favor of GPU as a platform for pricing derivatives.</p>]]></content><author><name>Oleksandr Gituliar</name></author><summary type="html"><![CDATA[After five years working as a quant, I can tell that the wast majority of derivative pricing in the financial industry is done on CPU. This is easily explained by two facts: (1) no GPU was available when banks started developing their pricing analytics in 90’s; and (2) banking is a conservative sector, slow to upgrade its technical stack.]]></summary></entry><entry><title type="html">Tasty C++ – Memory Layout of std::string</title><link href="https://tastycode.dev/blog/tasty-cpp-memory-layout-of-std-string" rel="alternate" type="text/html" title="Tasty C++ – Memory Layout of std::string" /><published>2023-08-07T00:00:00+02:00</published><updated>2023-08-07T00:00:00+02:00</updated><id>https://tastycode.dev/blog/tasty-cpp-memory-layout-of-std-string</id><content type="html" xml:base="https://tastycode.dev/blog/tasty-cpp-memory-layout-of-std-string"><![CDATA[<p>For a professional C++ developer, it’s important to understand memory organization of the data
+<p>This combined gives <u>10x factor</u> in favor of GPU as a platform for pricing derivatives.</p>]]></content><author><name>Oleksandr Gituliar</name></author><summary type="html"><![CDATA[After five years working as a quant, I can tell that the wast majority of derivative pricing in the financial industry is done on CPU. This is easily explained by two facts: (1) no GPU was available when banks started developing their pricing analytics in 90’s; and (2) banking is a conservative sector, slow to upgrade its technical stack.]]></summary></entry><entry><title type="html">Tasty C++ – ImGui state management</title><link href="http://localhost:4000/blog/imgui" rel="alternate" type="text/html" title="Tasty C++ – ImGui state management" /><published>2023-09-26T20:22:13+02:00</published><updated>2023-09-26T20:22:13+02:00</updated><id>http://localhost:4000/blog/imgui</id><content type="html" xml:base="http://localhost:4000/blog/imgui"><![CDATA[<h2 id="intro">Intro</h2>
+
+<ul>
+  <li>What is ImGui ?</li>
+  <li>ImGui is great when your data is already in the memory. How to load data from disk or fetch from
+network ?</li>
+  <li>getPrices_im(…) patterna (imediate mode = active polling, async, blocking)</li>
+</ul>]]></content><author><name>Oleksandr Gituliar</name></author><summary type="html"><![CDATA[Intro]]></summary></entry><entry><title type="html">Notes</title><link href="http://localhost:4000/blog/notes" rel="alternate" type="text/html" title="Notes" /><published>2023-09-26T20:17:32+02:00</published><updated>2023-09-26T20:17:32+02:00</updated><id>http://localhost:4000/blog/notes</id><content type="html" xml:base="http://localhost:4000/blog/notes"><![CDATA[<ul>
+  <li>
+    <p>Media Hub: blog post + YouTube video. Draw / animate memory, data structure operations. Memory as
+table, cache-line wide (64 bytes).</p>
+  </li>
+  <li>
+    <p>How costly is risk managing options in various models (PnL explain accuracy) ?</p>
+  </li>
+  <li>
+    <p>Cloud computing in finance is worth it (for batch jobs) ? Origin: start small and scale as needed.
+Memory management = slow serialization. What is core business and competence (hint, not software
+development or hardware ops).</p>
+  </li>
+</ul>
+
+<h2 id="tasty-c">Tasty C++</h2>
+
+<ul>
+  <li>
+    <p>Inter-Process Communication using Shared Code</p>
+  </li>
+  <li>
+    <p><code class="language-plaintext highlighter-rouge">DateTime</code> + <code class="language-plaintext highlighter-rouge">Duration</code> classes</p>
+  </li>
+  <li>
+    <p>Parser for Option Symbols (based on small user-defined strings ?)</p>
+  </li>
+  <li>
+    <p>Inside of <code class="language-plaintext highlighter-rouge">std::string</code> / <code class="language-plaintext highlighter-rouge">std::map</code> / <code class="language-plaintext highlighter-rouge">std::shared_ptr</code> / <code class="language-plaintext highlighter-rouge">std::set</code> / <code class="language-plaintext highlighter-rouge">std::vector</code>. Explain
+internals with step-by-step examples of various operations (and differences among most common
+implementations, if any).</p>
+  </li>
+</ul>
+
+<h2 id="quant-corner">Quant Corner</h2>
+
+<ul>
+  <li>
+    <p>Finite Difference: Multi-center grid</p>
+  </li>
+  <li>
+    <p>Local Volatility with FD PDE. Solve Dupire equation. Calibrate to American option prices. Switch
+to moneyness.</p>
+  </li>
+  <li>
+    <p>Interview Quants. Start with CS collegues.</p>
+  </li>
+  <li>
+    <p>Study correlation.</p>
+  </li>
+</ul>]]></content><author><name>Oleksandr Gituliar</name></author><summary type="html"><![CDATA[Media Hub: blog post + YouTube video. Draw / animate memory, data structure operations. Memory as table, cache-line wide (64 bytes).]]></summary></entry><entry><title type="html">Tasty C++ – Finite-Difference method with GPU</title><link href="http://localhost:4000/blog/finite-difference-gpu" rel="alternate" type="text/html" title="Tasty C++ – Finite-Difference method with GPU" /><published>2023-09-26T20:17:32+02:00</published><updated>2023-09-26T20:17:32+02:00</updated><id>http://localhost:4000/blog/finite-difference-gpu</id><content type="html" xml:base="http://localhost:4000/blog/finite-difference-gpu"><![CDATA[<h2 id="crossheck">Crossheck</h2>
+
+<p>Obviously, it doesn’t make sense to benchmark the wrong code. To ensure that my code is correct, I
+compare the results by pricing a portfolio of 4’495 American put options against a highly-accurate
+algorithm of Andersen et al. Its implementation by Klaus Spanderen is available in QuantLib, see his
+blog for more details [2]. Thank you Klaus for your contribution!</p>
+
+<p>In fact, this is the same portfolio used in [1], constructed of options by permuting all
+combinations of the following parameters (with filtering out options cheaper than 0.5):</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>Parameter</th>
+      <th>Range</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><strong>k</strong> – strike</td>
+      <td>100</td>
+    </tr>
+    <tr>
+      <td><strong>s</strong> – spot</td>
+      <td>25, 50, 80, 90, 100, 110, 120, 150, 175, 200</td>
+    </tr>
+    <tr>
+      <td><strong>t</strong> – time to maturity</td>
+      <td>1/12, 0.25, 0.5, 0.75, 1.0</td>
+    </tr>
+    <tr>
+      <td><strong>z</strong> – implied volatility</td>
+      <td>0.1, 0.2, 0.3, 0.4, 0.5, 0.6</td>
+    </tr>
+    <tr>
+      <td><strong>r</strong> – interest rate</td>
+      <td>2%, 4%, 6%, 8%, 10%</td>
+    </tr>
+    <tr>
+      <td><strong>q</strong> – dividend rate</td>
+      <td>0%, 4%, 8%, 12%</td>
+    </tr>
+    <tr>
+      <td><strong>w</strong> – parity</td>
+      <td>PUT</td>
+    </tr>
+  </tbody>
+</table>
+
+<p>In the table below are the crosscheck results, which contain root-mean-square (RMSE / RRMSE) and
+maximum (MAE / MRE) absolute / relative errors.</p>
+
+<table>
+  <thead>
+    <tr>
+      <th> </th>
+      <th>CPU x32</th>
+      <th>CPU x64</th>
+      <th>GPU x32</th>
+      <th>GPU x64</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>RMSE</td>
+      <td>20.7e-4</td>
+      <td>5.4e-4</td>
+      <td>15.8e-4</td>
+      <td>5.4e-4</td>
+    </tr>
+    <tr>
+      <td>RRMSE</td>
+      <td>9.9e-5</td>
+      <td>8.1e-5</td>
+      <td>9.1e-5</td>
+      <td>8.1e-5</td>
+    </tr>
+    <tr>
+      <td>MAE</td>
+      <td>23.7e-3</td>
+      <td>4.3e-3</td>
+      <td>25.1e-3</td>
+      <td>4.3e-3</td>
+    </tr>
+    <tr>
+      <td>MRE</td>
+      <td>1.1e-3</td>
+      <td>1.1e-3</td>
+      <td>1.1e-3</td>
+      <td>1.1e-3</td>
+    </tr>
+  </tbody>
+</table>
+
+<p>See Andersen et al where they compare the same portfolio with various other methods.</p>
+
+<h2 id="references">References</h2>
+
+<p><a href="https://hpcquantlib.wordpress.com/2022/10/09/high-performance-american-option-pricing">https://hpcquantlib.wordpress.com/2022/10/09/high-performance-american-option-pricing</a> by Klaus
+Spanderen</p>]]></content><author><name>Oleksandr Gituliar</name></author><summary type="html"><![CDATA[Crossheck]]></summary></entry><entry><title type="html">Finite-Difference method (backup)</title><link href="http://localhost:4000/blog/demo" rel="alternate" type="text/html" title="Finite-Difference method (backup)" /><published>2023-08-14T22:13:05+02:00</published><updated>2023-08-14T22:13:05+02:00</updated><id>http://localhost:4000/blog/demo</id><content type="html" xml:base="http://localhost:4000/blog/demo"><![CDATA[<h1 id="quant-corner-finite-difference-method"><strong>Quant Corner</strong>: Finite-Difference method</h1>
+
+<p>Finally, let’s take a quick look why it’s so easy to adopt finite-difference for GPU computing (at
+least in 1D case). In general, the price of a derivative instrument can be found as a solution of an
+ordinary differential equation (see
+<a href="https://en.wikipedia.org/wiki/Feynman%E2%80%93Kac_formula">Feynman–Kac formula</a>).</p>
+
+<p><strong>Pricing Equation.</strong> For one-asset derivatives, such as american options we saw above, the pricing
+differentail equation is</p>
+
+<p>\[ - \frac{\partial V}{\partial t} = - r(x,t) V(x,t) + \mu(x,t) \frac{\partial V}{\partial x} (x,t)</p>
+
+<ul>
+  <li>\frac{1}{2}\sigma^2(x,t) \frac{\partial^2 V}{\partial x^2}(x,t) \stackrel{\text{def}}{=} \widehat
+{A}_ {xx} V(x,t). \]</li>
+</ul>
+
+<p><strong>Discretization.</strong> Next, we apply
+<a href="https://en.wikipedia.org/wiki/Crank%E2%80%93Nicolson_method">Crank-Nicolson discretization</a> to this
+equation and get a system of linear equations for the unknown \( V(t- \delta t) \) given by</p>
+
+<p>\[ \big(1 - \theta \, \delta t \, \mathbb{A}_{xx}\big) V(t - \delta t, x) = \big(1 + (1 - \theta)
+\, \delta t \, \mathbb{A}_{xx} \big) V(t,x), \]</p>
+
+<p>where \( \mathbb{A}_{xx} \) is a descrete version of the \(\widehat {A}_ {xx} \) operator.</p>
+
+<p><strong>Back Propagation.</strong> To find the current price function, \( V(0,x) \), we propagate back from the
+maturity time \(t=T \) (when \( V(T,x) \) boundary condition is known) to the present time
+\(t=0\).</p>
+
+<p>A pseudo-code for the final valuation looks as following:</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>θ = 1/2
+for t in (T, T-dt, .., dt)
+    U = 1 - θ dt Axx                    //  3 x N matrix (tridiagonal)
+    Y = (1 + (1 - θ) dt Axx) V(t)       //  1 x N matrix (vector)
+
+    V(t-dt) = SolveTridiagonal(U, Y)    //  O(N), see Thomas algorithm
+
+    V(t-dt) = max(V(t-dt), payoff)      //  apply early-exercise constraint
+</code></pre></div></div>
+
+<p>For more details, see a series of lectures on “Finite Difference Methods for Financial Partial
+Differential Equations” by Andreasen &amp; Huge at <a href="https://github.com/brnohu/CompFin">https://github.com/brnohu/CompFin</a>.</p>]]></content><author><name>Oleksandr Gituliar</name></author><summary type="html"><![CDATA[Quant Corner: Finite-Difference method]]></summary></entry><entry><title type="html">Tasty C++ – Memory Layout of std::string</title><link href="http://localhost:4000/blog/tasty-cpp-memory-layout-of-std-string" rel="alternate" type="text/html" title="Tasty C++ – Memory Layout of std::string" /><published>2023-08-07T00:00:00+02:00</published><updated>2023-08-07T00:00:00+02:00</updated><id>http://localhost:4000/blog/tasty-cpp-memory-layout-of-std-string</id><content type="html" xml:base="http://localhost:4000/blog/tasty-cpp-memory-layout-of-std-string"><![CDATA[<p>For a professional C++ developer, it’s important to understand memory organization of the data
 structures, especially when it comes to the containers from the C++ Standard Library. In this post
 of Tasty C++ series we’ll look inside of <code class="language-plaintext highlighter-rouge">std::string</code>, so that you can more effectively work with
 C++ strings and take advantage and avoid pitfalls of the C++ Standard Library you are using.</p>
@@ -481,4 +680,4 @@ CppCon 2016 talk by Nicholas Ormrod.</li>
 Laity with the <a href="https://news.ycombinator.com/item?id=22198158">discussion on HN</a>.</li>
 </ul>
 
-<p>TastyCode by Oleksandr Gituliar.</p>]]></content><author><name>Oleksandr Gituliar</name></author><summary type="html"><![CDATA[About memory layout of std::string in the most popular c++ standard libraries: MSVC STL, GCC libstdc++, LLVM libc++.]]></summary><media:thumbnail xmlns:media="http://search.yahoo.com/mrss/" url="https://tastycode.dev/assets/img/2023-08-07/og-image.png" /><media:content medium="image" url="https://tastycode.dev/assets/img/2023-08-07/og-image.png" xmlns:media="http://search.yahoo.com/mrss/" /></entry></feed>
+<p>TastyCode by Oleksandr Gituliar.</p>]]></content><author><name>Oleksandr Gituliar</name></author><summary type="html"><![CDATA[About memory layout of std::string in the most popular c++ standard libraries: MSVC STL, GCC libstdc++, LLVM libc++.]]></summary><media:thumbnail xmlns:media="http://search.yahoo.com/mrss/" url="http://localhost:4000/assets/img/2023-08-07/og-image.png" /><media:content medium="image" url="http://localhost:4000/assets/img/2023-08-07/og-image.png" xmlns:media="http://search.yahoo.com/mrss/" /></entry></feed>
