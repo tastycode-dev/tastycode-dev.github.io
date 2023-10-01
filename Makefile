@@ -6,7 +6,7 @@ serve:
 build:
 	JEKYLL_ENV=production jekyll build
 
-deploy:
+deploy: build
 	yarn deploy
 
 

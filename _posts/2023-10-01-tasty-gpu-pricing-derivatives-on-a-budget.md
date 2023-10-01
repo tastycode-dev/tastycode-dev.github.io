@@ -2,6 +2,7 @@
 layout: post
 author: Oleksandr Gituliar
 title: "Tasty GPU – Pricing Derivatives on a Budget"
+image: /assets/img/2023-10-01/bench-512-cpu-gpu.png
 ---
 
 After five years working as a quant, I can tell that the wast majority of derivative pricing in the
@@ -82,7 +83,7 @@ for pricing american options.
 **Results.** A plot below depicts the main results. Each bin shows how many options are priced per
 second (higher is better):
 
-![Benchmark CPU vs GPU](/assets/img/2023-08-22/bench-512-cpu-gpu.png)
+![Benchmark CPU vs GPU](/assets/img/2023-10-01/bench-512-cpu-gpu.png)
 
 **US Options Market.** To get some idea about how these results are useful in practice, let's have a
 look at a size of the US options market. The data from [OPRA](https://www.opraplan.com) tells that
@@ -137,7 +138,7 @@ This gives extra 3-5x cost reduction in favor of GPU.
 <u>old machines</u>. Below is the same benchmark run on a much older machine with dual
 [Xeon X5675](https://www.techpowerup.com/cpu-specs/xeon-x5675.c949) from 2011:
 
-![Benchmark CPU vs GPU](/assets/img/2023-08-22/bench-z800.png)
+![Benchmark CPU vs GPU](/assets/img/2023-10-01/bench-z800.png)
 
 What immediately catches the eye is that Ryzen 9 outperforms the dual-Xeon machine (both have equal
 number of physical cores, btw). This is not a surprise, given a 10-year technological gap.
