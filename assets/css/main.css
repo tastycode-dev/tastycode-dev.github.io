@@ -144,6 +144,19 @@
   .post-subtitle a {
     color: #66f;
   }
+
+  .social-media:hover {
+    @apply no-underline;
+  }
+  .social-media img {
+    @apply mx-2 mb-1;
+    display: inline-block;
+    width: 26px;
+  }
+
+  .social-media img:hover {
+    transform: scale(1.5);
+  }
 }
 
 @media (max-width: 768px) {
