@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="4.3.2">Jekyll</generator><link href="https://tastycode.dev/feed.xml" rel="self" type="application/atom+xml" /><link href="https://tastycode.dev/" rel="alternate" type="text/html" /><updated>2023-10-01T09:59:39+02:00</updated><id>https://tastycode.dev/feed.xml</id><title type="html">TastyCode</title><author><name>Oleksandr Gituliar</name></author><entry><title type="html">Tasty GPU – Pricing Derivatives on a Budget</title><link href="https://tastycode.dev/blog/tasty-gpu-pricing-derivatives-on-a-budget" rel="alternate" type="text/html" title="Tasty GPU – Pricing Derivatives on a Budget" /><published>2023-10-01T00:00:00+02:00</published><updated>2023-10-01T00:00:00+02:00</updated><id>https://tastycode.dev/blog/tasty-gpu-pricing-derivatives-on-a-budget</id><content type="html" xml:base="https://tastycode.dev/blog/tasty-gpu-pricing-derivatives-on-a-budget"><![CDATA[<p>After five years working as a quant, I can tell that the wast majority of derivative pricing in the
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="4.3.2">Jekyll</generator><link href="https://tastycode.dev/feed.xml" rel="self" type="application/atom+xml" /><link href="https://tastycode.dev/" rel="alternate" type="text/html" /><updated>2023-10-01T10:15:32+02:00</updated><id>https://tastycode.dev/feed.xml</id><title type="html">TastyCode</title><author><name>Oleksandr Gituliar</name></author><entry><title type="html">Tasty GPU – Pricing Derivatives on a Budget</title><link href="https://tastycode.dev/blog/tasty-gpu-pricing-derivatives-on-a-budget" rel="alternate" type="text/html" title="Tasty GPU – Pricing Derivatives on a Budget" /><published>2023-10-01T00:00:00+02:00</published><updated>2023-10-01T00:00:00+02:00</updated><id>https://tastycode.dev/blog/tasty-gpu-pricing-derivatives-on-a-budget</id><content type="html" xml:base="https://tastycode.dev/blog/tasty-gpu-pricing-derivatives-on-a-budget"><![CDATA[<p>After five years working as a quant, I can tell that the wast majority of derivative pricing in the
 financial industry is done on CPU. This is easily explained by two facts: (1) no GPU was available
 when banks started developing their pricing analytics in 90’s; and (2) banking is a conservative
 sector, slow to upgrade its technical stack.</p>
@@ -34,7 +34,7 @@ time to cover this topic later.</p>
 as faster usually means better (given all other factors equal).</li>
   <li>How much <u>cheaper</u> is GPU vs CPU? <br /> Budget is always important when making decisions.
 Speed matters because fast code means less CPU time, but there are other essential factors worth
-discussing that imact your budget.</li>
+discussing that impact your budget.</li>
 </ul>
 
 <h2 id="benchmark">Benchmark</h2>
@@ -149,7 +149,7 @@ in 2020.</li>
 <h2 id="budget">Budget</h2>
 
 <p>In the production environment, <u>faster</u> is almost always means <u>cheaper</u>. Speed is not the
-only factor that affects operational costs. Let’s take a look at other factors that appeal in favour
+only factor that affects operational costs. Let’s take a look at other factors that appeal in favor
 of GPU:</p>
 
 <!-- **Cheap to setup.** In Apr'23, on a secondary market in Denmark I paid $250 for the AMD Ryzen 9
@@ -165,7 +165,7 @@ which is especially popular among crypto miners. Such a motherboard can handle <
 single machine</u>. In addition, there is no need to setup a network, manage software on various
 machines, and hire an army of devops to automate all that.</p>
 
-<p>This gives extra 3-5x cost reduction in favour of GPU.</p>
+<p>This gives extra 3-5x cost reduction in favor of GPU.</p>
 
 <p><strong>Cheap to upgrade.</strong> PCI-E standard is backward compatible, so that new GPU cards are still run on
 <u>old machines</u>. Below is the same benchmark run on a much older machine with dual
@@ -192,7 +192,7 @@ financial industry. However, what is the benefit of running it on GPU ?</p>
   <li>GPU is 3x-5x cheaper</li>
 </ul>
 
-<p>This combined gives <u>10x factor</u> in favour of GPU as a platform for pricing derivatives.</p>]]></content><author><name>Oleksandr Gituliar</name></author><summary type="html"><![CDATA[After five years working as a quant, I can tell that the wast majority of derivative pricing in the financial industry is done on CPU. This is easily explained by two facts: (1) no GPU was available when banks started developing their pricing analytics in 90’s; and (2) banking is a conservative sector, slow to upgrade its technical stack.]]></summary></entry><entry><title type="html">Tasty C++ – Memory Layout of std::string</title><link href="https://tastycode.dev/blog/tasty-cpp-memory-layout-of-std-string" rel="alternate" type="text/html" title="Tasty C++ – Memory Layout of std::string" /><published>2023-08-07T00:00:00+02:00</published><updated>2023-08-07T00:00:00+02:00</updated><id>https://tastycode.dev/blog/tasty-cpp-memory-layout-of-std-string</id><content type="html" xml:base="https://tastycode.dev/blog/tasty-cpp-memory-layout-of-std-string"><![CDATA[<p>For a professional C++ developer, it’s important to understand memory organization of the data
+<p>This combined gives <u>10x factor</u> in favor of GPU as a platform for pricing derivatives.</p>]]></content><author><name>Oleksandr Gituliar</name></author><summary type="html"><![CDATA[After five years working as a quant, I can tell that the wast majority of derivative pricing in the financial industry is done on CPU. This is easily explained by two facts: (1) no GPU was available when banks started developing their pricing analytics in 90’s; and (2) banking is a conservative sector, slow to upgrade its technical stack.]]></summary></entry><entry><title type="html">Tasty C++ – Memory Layout of std::string</title><link href="https://tastycode.dev/blog/tasty-cpp-memory-layout-of-std-string" rel="alternate" type="text/html" title="Tasty C++ – Memory Layout of std::string" /><published>2023-08-07T00:00:00+02:00</published><updated>2023-08-07T00:00:00+02:00</updated><id>https://tastycode.dev/blog/tasty-cpp-memory-layout-of-std-string</id><content type="html" xml:base="https://tastycode.dev/blog/tasty-cpp-memory-layout-of-std-string"><![CDATA[<p>For a professional C++ developer, it’s important to understand memory organization of the data
 structures, especially when it comes to the containers from the C++ Standard Library. In this post
 of Tasty C++ series we’ll look inside of <code class="language-plaintext highlighter-rouge">std::string</code>, so that you can more effectively work with
 C++ strings and take advantage and avoid pitfalls of the C++ Standard Library you are using.</p>
