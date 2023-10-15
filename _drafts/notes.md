@@ -27,11 +27,14 @@ title: "Notes"
 
 ## Quant Corner
 
+- What goes wrong when pricing Americans with Black-Scholes ? How to tell if the model works ? PnL
+  explain.
+
 - Finite Difference: Multi-center grid
 
 - Local Volatility with FD PDE. Solve Dupire equation. Calibrate to American option prices. Switch
   to moneyness.
 
-- Interview Quants. Start with CS collegues.
+- Interview Quants. Start with CS colleagues.
 
 - Study correlation.
