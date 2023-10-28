@@ -1,7 +1,7 @@
 ---
 layout: post
 author: Oleksandr Gituliar
-title: "Tasty Quant – Finite-Difference at 60fps"
+title: "Theory of the Finite-Difference Method"
 ---
 
 Finally, let's take a quick look why it's so easy to adopt finite-difference for GPU computing (at
