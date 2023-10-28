@@ -11,6 +11,10 @@ compare the results by pricing a portfolio of 4'495 American put options against
 algorithm of Andersen et al. Its implementation by Klaus Spanderen is available in QuantLib, see his
 blog for more details \[2\]. Thank you Klaus for your contribution!
 
+![Benchmark CPU vs GPU](/assets/img/demo.png)
+
+![Benchmark CPU vs GPU](/assets/img/demo2.png)
+
 In fact, this is the same portfolio used in \[1\], constructed of options by permuting all
 combinations of the following parameters (with filtering out options cheaper than 0.5):
 
