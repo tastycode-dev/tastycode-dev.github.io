@@ -24,7 +24,30 @@ everything I learned while porting the finite-difference pricer for American opt
 Linux. In my case, it was Windows 11 and Ubuntu 22.04. I also use Visual Studio 2022 with CMake
 projects, which allow me to smoothly compile my code on both platforms.
 
-## GPU Memory
+## Finite-Difference Pricer
+
+At first, let's look inside of the finite-difference pricer, so that we
+better understand computational steps, their complexity, and potential to run in parallel on GPU.
+
+**Backward Evolution.** The overall idea is to start with an option price at the maturity and
+backward propagate it to the current point in time. The propagation happens on the 2D grid with
+stock price and time to maturity along the axes. The backward evolution is governed by a discrete
+version of the partial-differential equation, which is a difference equation, hence the name of the
+method.
+
+**Tridiagonal System.** Every backward step requires to solve a tridiagonal system of linear
+equations. For this we can use the Thomas algorithm which is a simplified version of Gaussian
+elimination and takes 20 lines of C++ code.
+
+![CPU](/assets/img/fd-cpu.gif)
+
+**Parallelization.** There are parallel versions of the Thomas method, however they are complex and
+don't utilize all available cores at maximum performance.
+
+## GPU Programming
+
+A seasoned C++ programmer should have no difficulties to sketch CPU code for the animated algorithm.
+Let's see why it might be not so straightforard on GPU and what we should do instead.
 
 **GPU has its own RAM.** This shouldn't be a surprise to you, as anyone who has been looking for a
 GPU card knows that "Memory Size" is in the specs of every GPU. The memory chip is soldered directly
@@ -78,62 +101,6 @@ what another `DeviceToHost` flag is used for.
 `cudaMemcpy` is too low-level especially when you need to manually manage memory with `cudaMalloc`
 and`cudaFree` without relying on smart pointers. Unfortunately you can't use STL in CUDA (there is
 Thrust, but I did not try it)...
-
-**Abstraction.** In my case, I wrote a `Vector2d` class to abstract low-level operations
-
-<!-- - template + constexpr
-
-```c++
-template<u64 Options>
-class Vector2d
-{
-private:
-  f64* m_buf;
-
-public:
-  __host__
-  Vector2d(u64 nCol, u64 nRow)
-  {
-    if constexpr (traits<Vector2d>::isCpu)
-      m_buf = malloc(nCol * nRow * sizeof(f64));
-    if constexpr (traits<Vector2d>::isGpu)
-      cudaMalloc(&m_buf, nCol * nRow * sizeof(f64));
-    else
-      static_assert("Unknown device")
-  }
-}
-```
-
-See how `traits<Vector2d>` is done in ... on GitHub.
-
-```c++
-template<typename RhsVector2d>
-__host__
-Vector2d&
-    operator=(const RhsVector2d& src)
-{
-  // CPU -> GPU
-  if constexpr (traits<Vector2d>::isGpu &&
-                traits<RhsVector2d>::isCpu)
-    cudaMemcpy(m_buf, src.buf(), src.size(), cudaMemcpyHostToDevice);
-
-  // GPU -> CPU
-  else if constexpr (traits<Vector2d>::isGpu &&
-                     traits<RhsVector2d>::isCpu)
-    cudaMemcpy(m_buf, src.buf(), src.size(), cudaMemcpyDeviceToHost);
-
-  // GPU -> GPU
-  else if constexpr (traits<Vector2d>::isGpu &&
-                     traits<RhsVector2d>::isGpu)
-    cudaMemcpy(m_buf, src.buf(), src.size(), cudaMemcpyDeviceToDevice);
-
-  // CPU -> CPU
-  else
-    std::memcpy(m_buf, src.buf(), src.sizeInBytes());
-
-  return *this;
-}
-``` -->
 
 ## GPU Code
 
