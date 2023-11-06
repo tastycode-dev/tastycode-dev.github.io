@@ -15,13 +15,13 @@ Until recently, when I started coding a finite-difference method for pricing der
 realized that it might be a good candidate to run on GPU as well. In my previous post, [Pricing
 Derivatives on a Budget](), I presented benchmarks for pricing American Options on CPU vs GPU.
 
-After reading this post, you will be ready to start your own journey with GPU programming in C++.
-It's neither scarry nor difficult, believe me. I'm going to share with you everything I learned
-while porting my finite-difference pricer for American options from CPU to GPU.
+I hope, that after reading this post, you will be ready to start your own journey with GPU
+programming in C++. It's neither scarry nor difficult, believe me. I'm going to share with you
+everything I learned while porting the finite-difference pricer for American options to GPU.
 
-We will use C++ and CUDA SDK from Nvidia. You have freedom to install CUDA on Windows or Linux. In
-my case, it was Windows 11 and Ubuntu 22.04. I also use Visual Studio 2022 with CMake-based projects
-which allow me to comfortably compile my code on both platforms.
+We will use C++ and CUDA SDK from Nvidia, which you can install it on Windows or Linux. In my case,
+it was Windows 11 and Ubuntu 22.04. I also use Visual Studio 2022 with CMake-based projects, which
+allow me to comfortably compile my code on both platforms.
 
 ## GPU Memory
 
@@ -139,8 +139,8 @@ Vector2d&
 ## GPU Code
 
 **CUDA Kernels.** Now let's talk about CUDA kernels, which are C++ functions that run on GPU with a
-direct access to GPU memory. A special feature of the kernel is that GPU runs it in parallel
-on thousands of GPU cores. GPU cores are not as fast as CPU cores, but running thousands of them in
+direct access to GPU memory. A special feature of the kernel is that GPU runs it in parallel on
+thousands of GPU cores. GPU cores are not as fast as CPU cores, but running thousands of them in
 parallel feels very fast.
 
 Source code for CUDA kernels is located in `.cu` files and isn't much different from regular C++
