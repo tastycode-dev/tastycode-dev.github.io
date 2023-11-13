@@ -20,14 +20,14 @@ I hope, that after reading this post, you will be ready to start your own journe
 programming in C++. It's neither scarry nor difficult, believe me. I'm going to share with you
 everything I learned while porting the finite-difference pricer for American options to GPU.
 
-**Tools.** We will use C++ and CUDA SDK from Nvidia, which you can install on Windows or
-Linux. In my case, it was Windows 11 and Ubuntu 22.04. I also use Visual Studio 2022 with CMake
-projects, which allow me to smoothly compile my code on both platforms.
+**Tools.** We will use C++ and CUDA SDK from Nvidia, which you can install on Windows or Linux. In
+my case, it was Windows 11 and Ubuntu 22.04. I also use Visual Studio 2022 with CMake projects,
+which allow me to smoothly compile my code on both platforms.
 
 ## Finite-Difference Pricer
 
-At first, let's look inside of the finite-difference pricer, so that we
-better understand computational steps, their complexity, and potential to run in parallel on GPU.
+At first, let's look inside of the finite-difference pricer, so that we better understand
+computational steps, their complexity, and potential to run in parallel on GPU.
 
 **Backward Evolution.** The overall idea is to start with an option price at the maturity and
 backward propagate it to the current point in time. The propagation happens on the 2D grid with
@@ -39,10 +39,14 @@ method.
 equations. For this we can use the Thomas algorithm which is a simplified version of Gaussian
 elimination and takes 20 lines of C++ code.
 
-![CPU](/assets/img/fd-cpu.gif)
+<!-- ![CPU](/assets/img/fd-cpu-comics.png) -->
+
+<!-- ![CPU](/assets/img/fd-cpu.png) -->
 
 **Parallelization.** There are parallel versions of the Thomas method, however they are complex and
 don't utilize all available cores at maximum performance.
+
+![CPU](/assets/img/fd-cpu-comics.gif)
 
 ## GPU Programming
 
