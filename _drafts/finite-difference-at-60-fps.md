@@ -6,49 +6,74 @@ title: "Finite-Difference at 60fps"
 
 _Intro._ Programs = Algorithms + Data Structures + Platform
 
-**Intro.** I hear about GPU computing nowadays more often than ever. Sometimes it's hard to believe
-what an incredible things people are building with a tiny box just for crunching floating-point
-numbers that we call GPU.
+**GPU computing** is a buzzword today more than ever. It's unbelievable sometimes what people are
+building with a tiny box just for crunching floating-point numbers that we call GPU. _LLM, image
+generation models, but also HPC on GPU_
 
 I was curious about GPU programming for a couple of years now, but never had a chance to write
-anything it myself. Until recently, when I started coding a finite-difference pricer for american
-options and realized that it might be a good candidate to run on GPU as well. In my previous
-post, [Pricing Derivatives on a Budget](), I presented my benchmarks for CPU and GPU.
+anything at a GPU level myself. Until recently, when I started coding a finite-difference pricer for
+american options and realized that it might be a good candidate to run on GPU as well. Take a look
+at my previous post, [Pricing Derivatives on a Budget](), with benchmarks and some performance
+analysis.
 
-I'm going to share with you everything I learned while coding my pricer for GPU. After reading this
-post, you will be ready to start your own journey with GPU programming in C++. It's neither scarry
-nor difficult, believe me.
+**In this post** I show how to implement a [Finite-Difference
+Pricer](https://en.wikipedia.org/wiki/Finite_difference_methods_for_option_pricing#External_links)
+on GPU. It is for people familiar with C++, but with no prior experience of programming for GPU.
 
-**Tools.** We will use C++ and CUDA SDK from Nvidia, which you can install on Windows or Linux. In
-my case, it was Windows 11 and Ubuntu 22.04. I also use Visual Studio 2022 with CMake projects,
-which allow me to smoothly compile my code on both platforms.
+Hands-on experience with a finite-difference method is not required. You'll find an overview with
+all necessary details below. For now we need to know only key calculation steps, without deep
+details of the algorithm. It's neither scarry nor difficult, believe me.
+
+Let me know if you want those details in the next post (like, react,
+subscribe, etc.). For now, see books for more details.
+
+**We will use C++** and [CUDA SDK](https://developer.nvidia.com/cuda-toolkit), which is available
+for Linux and Windows. My current setup is Ubuntu 22.04 and Windows 11 with Visual Studio 2022. To
+compile cross-platform I use CMake, which is deeply integrated with Visual Studio and gives as smooth
+development experience as native VS project.
 
 ## Finite-Difference Pricer
 
-At first, let me briefly describe what is inside of the finite-difference pricer and how it works.
-You don't need to know any complicated math, basics of linear algebra will be enough.
+As promised, let me briefly describe what is inside of the finite-difference pricer and what
+computational challanges should we expect. You don't need to know any complicated math, basics of
+linear algebra will be enough.
 
-**Backward Evolution.** The overall idea is simple: we evolve an option price backwards in time to
-the present moment from the future moment where it's known. The future moment is maturity time,
-where option price is simply a payoff.
+**The problem we solve** is to find a price of the american option today given that we know it at
+some future point in time. The future point is expiry date as option price is simply a payoff, e.g.,
+`max(0, S-K)` for call options.
 
-The backward evolution is driven by the _evolution matrix_ which is a tridiagonal matrix that
-depends on volatility, interest and dividend rates. The evolution matrix is a discrete version of
-partial-differential equation for the option price, see Wilmott for more details.
+This problem is easy to generalize to other derivatives that's why the finite-difference is so
+popular for pricing a wide range of instruments.
 
-**Tridiagonal System.** To make a backward step on the grid we should solve a tridiagonal system of
-linear equations. This is usually done using Thomas algorithm which is a simplified version of Gaussian
-elimination. Its implementation take 10 lines of C++ code, so not very complicated.
+**Backward Evolution.** Given that the option price is known at some point in future, the overall
+idea is to evolve it backwards in time to the present moment. The backward evolution is driven by
+the _evolution matrix_ which is a [tridiagonal
+matrix](https://en.wikipedia.org/wiki/Tridiagonal_matrix) that depends on volatility, interest and
+dividend rates.
 
-<!-- ![CPU](/assets/img/fd-cpu-comics.png) -->
+In short, the evolution matrix is a _discrete form_ of the continous partial-differential equation
+for the option price. The discretization step also define a finite grid, points on the spot-time
+plane, where we will calculate our function. The practical size of the grid is usualy 500 (spot) x
+1000 (time) points. See Wilmott for more details.
 
-<!-- ![CPU](/assets/img/fd-cpu.png) -->
+**Tridiagonal System.** For every backward step on the grid we have to solve a tridiagonal system.
+In total, this results in solving 1000 systems of the size 500 at the end of the calculation.
 
-**Parallelization.** What is complicated however, is to run Thomas algorithm in parallel. There are
-some parallel implementation, which are complex and don't utilize all available cores at maximum
-performance.
+The solution is usually found with the [Thomas
+algorithm](https://en.wikipedia.org/wiki/Tridiagonal_matrix_algorithm) which is a simplified version
+of Gaussian elimination. Its implementation take 10 lines of C++ code, so not very complicated.
 
-I made an attempt to visualize all said above in the following animation:
+**Parallelization.** Apart from a couple of matrix multiplications, the Thomas algorithm in the
+bottleneck of the overall computation. Unfortunately, it has no parallel version. There are some
+parallelized alternatives, which are complex and optimaly utilize available cores. We alos can't
+solve all 1000 systems at once as every system depends on the solution of the previous system.
+
+What we can do is to solve multiple grids in parallel, effectively pricing multiple american options
+in parallel. Of course, this approach gives no speedup for pricing a single option. However, it is
+handy when working with a portfolio of options or a whole option chain, which is what usually
+happens in practice.
+
+I made an attempt to visualize the solution process in the following animation:
 
 ![CPU](/assets/img/fd-cpu-comics.gif)
 
