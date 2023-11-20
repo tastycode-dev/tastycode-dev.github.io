@@ -4,6 +4,8 @@ author: Oleksandr Gituliar
 title: "Notes"
 ---
 
+**Statistical Arbitrage.** Exploit market inefficiencies (arbitrage) with statistical tools.
+
 - Media Hub: blog post + YouTube video. Draw / animate memory, data structure operations. Memory as
   table, cache-line wide (64 bytes).
 
