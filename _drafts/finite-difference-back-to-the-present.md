@@ -67,11 +67,7 @@ personal preference):
 
 Please, share in the comments you have different experience.
 
-![Pricing PDE](/assets/img/fd-pde.png)
-
-![Pricing PDE](/assets/img/fd-pde-x.png)
-
-![Pricing PDE](/assets/img/fd-x.png)
+![Pricing PDE](/assets/img/fd-black-scholes.jpg)
 
 ## Numerical Solution
 
@@ -103,11 +99,9 @@ operation is defined on the `(t,x)` grid.
 
 Forward difference (backward difference):
 
-![Discretization](/assets/img/fd-dVdt.png)
-
 Central difference:
 
-![Discretization](/assets/img/fd-dVdx.png)
+![Discretization](/assets/img/fd-difference.png)
 
 **3) Finite-Difference Equation**, a discrete version of the Black-Scholes equation, is derived from
 the pricing equation by replacing continuous derivatives with difference operators defined above.
@@ -115,7 +109,7 @@ the pricing equation by replacing continuous derivatives with difference operato
 It's convenient to introduce the A operator, which contains difference operators over the x-axis
 only.
 
-![Pricing PDE](/assets/img/fd-pde2.png)
+![Pricing PDE](/assets/img/fd-difference-equation.png)
 
 **4) Solution Scheme.** The equation above is not defined completely yet, as we still have freedom
 of choice for the difference operators.
@@ -138,7 +132,7 @@ of forward and backward schemes that reduces the numerical error.
 - Euler backward for `\theta = 0`
 - Crank-Nicolson for `\theta = 1/2`
 
-![Pricing PDE](/assets/img/fd-schemes.png)
+![Finite-Difference Schemes](/assets/img/fd-crank-nicolson.png)
 
 **5) Backward Evolution**
 
@@ -186,7 +180,7 @@ some non-uniform step here, at least not something I observed in practice.
 
 **The x-Axis** is divided in a more tricky way. ...
 
-![Asinh Plot](/assets/img/asinh.png)
+![Asinh Plot](/assets/img/fd-asinh.png)
 
 ```cpp
 /// Init X-Grid
