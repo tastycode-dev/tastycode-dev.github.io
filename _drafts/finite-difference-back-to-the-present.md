@@ -1,61 +1,98 @@
 ---
 layout: post
 author: Oleksandr Gituliar
-title: "Finite-Difference – Back to the Present"
+title: "Finite-Difference"
 ---
 
 - Option Chain for AAPL / AMD / TSLA
 
-**In this post** I'll show how to implement a
-[Finite-Difference Pricer](https://en.wikipedia.org/wiki/Finite_difference_methods_for_option_pricing)
-for American options. It should be accessible for people without C++ experience, but some basic
-knowledge of the options pricing would be helpful, although also not required.
+**Pricing American options** is an open problem in the quantitative finance. Currently, it has no
+closed form solution similar to the Black-Scholes formula for European options. Therefore, various
+_numerical methods_ are used to solve this problem in practice. This post is about one of such
+methods -- [Finite-Difference
+Method](https://en.wikipedia.org/wiki/Finite_difference_methods_for_option_pricing).
 
-It's neither required to have hands-on experience with a finite-difference method. You'll find an
-overview with all necessary details below, since for this post we need only key calculation steps,
-without deep details of the algorithm. It's neither scarry nor difficult, believe me.
+I code in C++,
+however it should be accessible for people even with minimum C++ experience. It is more important to
+have basic knowledge of options and linear algebra, although not required either.
 
-Let me know if you want those details in the next post (like, react, subscribe, etc.). For now, see
-books for more details.
+You don't need to have hands-on experience with a finite-difference method. All necessary details
+will appear as we go. It's neither scarry nor difficult, believe me.
 
-**We will use C++** on Linux and Windows. My current setup is Ubuntu 22.04 and Windows 11 with
-Visual Studio 2022. To compile cross-platform I use CMake, which is deeply integrated with Visual
-Studio and gives as smooth development experience as native VS project.
+**C++ is a great language** to implement a finite-difference pricer. My current setup is Ubuntu
+22.04 and Windows 11 with Visual Studio 2022. To compile cross-platform I use CMake, which is deeply
+integrated with Visual Studio and gives excellent development experience, similar to a native VS
+project.
 
 **Pricing for the Market** ...
 
 ![AMD Option Chain on 2023-11-17 15:05](/assets/img/202311171505-AMD-retro.png)
 
+**Don't worry** if some concepts seem complicated at first. There is nothing difficult in what
+follows. Trust me. Give it another chance and consult references for more details and alternative
+perspective, which usually helps to connect the dots.
+
+Let's start!
+
 ## Pricing Equation
 
-**Derivative price** is defined by the Black-Scholes equation. It is a partial-differential equation
-which defines dynamics of the derivative price as a function of time and spot (or several spot
-variables in exotic cases).
+- Black-Scholes formula / equation
+- Black-Scholes family of equations
 
-![Pricing PDE](/assets/img/fd-black-scholes.jpg)
+It's not a surprise that we start with the [Black-Scholes
+equation](https://en.wikipedia.org/wiki/Black%E2%80%93Scholes_equation), since it's this equation
+that we should solve to find the price of the American option. I'm not going to dwell much on its
+foundation and properties here, however there is one thing I'd like to stress.
 
-Below is a brief overview of two methods to derive this equation, in order of my personal
-preferences.
+**The European Option's** price, defined by the famous [Black-Scholes formula](), is just a
+particular example of the Black-Scholes equation. In general, we can define similar pricing
+equations for many other derivative types and flavours.
 
-**Delta Hedging.** This is a very intuitive yet powerful way to derive a pricing equation, not only
-for vanilla options, but for more exotic multi-asset instruments as well.
+ <!-- Equations of this family have very similar
+mathematical structure and can be solved using the finite-difference method we discuss here. This
+makes it a very robust method for pricing derivatives that is worth to be familiar with. -->
 
-**Feynman-Kac Theorem.** This approach is very theoretical and so far I don't find it useful in
-practice.
+**The pricing equation** is usually derived using one of the following methods (in order of my
+personal preference):
+
+- [Delta Hedging]() argument is a very intuitive yet powerful way to derive a pricing equation, not
+  only for vanilla options, but for more exotic multi-asset derivatives as well. See ... for more
+  details.
+
+- [Feynman-Kac Theorem]() is very theoretical and I don't find it useful in practice.
 
 Please, share in the comments you have different experience.
 
-## Finite-difference grid
+![Pricing PDE](/assets/img/fd-black-scholes.jpg)
 
-Differential equations without a closed-form solution are usually solved numerically, with a
-finite-difference method being one of the most popular used in practice (others popular methods are
-Monte-Carlo and Fourier transformation), derivatives calculated on a grid with small steps between
-valuation points.
+## Numerical Solution
 
-Fortunately, the diffusion equation is one of the easiest to solve numerically.
+**The Black-Scholes equations** belong to the family of [diffusion equations](), which in general
+case have no closed-form solution. For now we should remember only that it's one of the easiest
+differential equations to solve numerically. Usually, apart from the
+[Finite-Difference method](https://en.wikipedia.org/wiki/Finite_difference_method), they are also treated
+with [Monte-Carlo]() or [Fourier transformation]() methods.
 
-**Discretization.** Let's introduce a rectangular grid on the domain of independent variables (t,s)
-defined by x[i] = x[i-1] + dx_i and t[j] = t[j-1] + dt and labeled by i and j indices.
+**The Unknown.** Let's start by formulating a problem we solve. Ultimately, we're looking for the
+**option price** as a function `V(t,s)`, for _arbitrary spot_ price `s` at a _fixed time_ `t=0`,
+where
+
+- `t` is the future time from today;
+- `s` is the spot price of the option's underlying asset.
+
+Next, we continue with particular steps of the method:
+
+**1) Finite Grid** is defined an `N x M` rectangular grid on the domain of independent variables
+`(t,s)` defined as
+
+- `t[i] = t[i-1] + dt[i] ` for `i=0..N-1`
+- `x[j] = x[j-1] + dx[j] ` for `j=0..M-1`.
+
+This naturally leads to the following C++ definitions:
+
+**2) Difference Operator** is used to approximate continuous derivatives with a [finite
+difference](https://en.wikipedia.org/wiki/Finite_difference#Basic_types) operation on the grid that
+we have defined above.
 
 Forward difference (backward difference):
 
@@ -63,34 +100,38 @@ Central difference:
 
 ![Discretization](/assets/img/fd-difference.png)
 
-Finite-Difference Equation(Discrete PDE) step-by-step generates solution from the initial values:
+**3) Finite-Difference Equation**, a discrete version of the Black-Scholes equation, is derived from
+the pricing equation by replacing continuous derivatives with difference operators defined above.
+
+It's convenient to introduce the A operator, which contains difference operators over the x-axis
+only.
 
 ![Pricing PDE](/assets/img/fd-difference-equation.png)
 
-**Crank-Nicolson** is probably on of the most popular discretization schemes for the Black-Scholes
-equation.
+**4) Solution Scheme.** The equation above is not defined completely yet, as we still have freedom
+of choice for the difference operators.
 
-Explicit:
+**\delta_x and \delta_xx** operators are generally chosen according to the central difference
+definition above.
 
-- Euler forward
-- Euler backward
+**\delta_t** operator, on the other hand, might be chosen as _Forward_ or _Backward_ difference,
+which lead to the [explicit
+scheme](https://en.wikipedia.org/wiki/Finite_difference_method#Explicit_method) solution. However,
+the numerical error is O(dt) + O(dx^2), which is not the best we can achieve.
 
-Implicit:
+**[Crank-Nicolson](https://en.wikipedia.org/wiki/Finite_difference_method#Crank%E2%80%93Nicolson_method)
+scheme** is an implicit scheme, which is a better alternative to the explicit scheme, because the
+numerical error is O(dt^2) + O(dx^2). It's slightly more complicated, since requires to solve a
+liner system of equation, however offers better convergence. In short, Crank-Nicolson scheme is is a
+fine mix of forward and backward schemes that reduces the numerical error.
 
-- Crank-Nicolson
+- Euler forward for `\theta = 1`
+- Euler backward for `\theta = 0`
+- Crank-Nicolson for `\theta = 1/2`
 
 ![Finite-Difference Schemes](/assets/img/fd-crank-nicolson.png)
 
-Depending on how we expand the time derivative, we get forward or backward equation (?). These
-equations however are O(dt + dx^2) error. We can do better than that by introducing a continuos
-parameter \theta that defines a mixed scheme which is strictly forward for \theta = 1, backward for
-\theta = 0, and mixed for everything in between. For \theta = 1/2 it's called Crank-Nicolson scheme
-and has O(dt^2 + dx^2) error.
-
-Finally, we get a linear system of equations that defines evolution of the price function over the
-time axis.
-
-## Backward Evolution
+**5) Backward Evolution**
 
 We don't know function V(t=0, s), obviously this is what we are looking for. Hence, forward
 evolution is no go, as we don't know the initial condition is unknown. However, we know the initial
@@ -99,10 +140,10 @@ condition for the backward evolution, as V(t=T, s) is a payoff at expiry. It is 
 
 **Thomas Algorithm** is [link](https://en.wikipedia.org/wiki/Tridiagonal_matrix_algorithm) ...
 
-**For American options** we should taken into account the right to early exercise. If continue like
-that we will get a European option price. For the American exercise, we should ensure that option
-price is not less than its intrinsic value, otherwise we'll get an arbitrage situation when one can
-buy an option for the lower price than its exercise value.
+**6) Early Exercise.** For American options we should taken into account the right to early
+exercise. If continue like that we will get a European option price. For the American exercise, we
+should ensure that option price is not less than its intrinsic value, otherwise we'll get an
+arbitrage situation when one can buy an option for the lower price than its exercise value.
 
 In other words:
 
@@ -110,13 +151,26 @@ In other words:
 
 ## Boundary Conditions
 
-The last topic left for the discussion is how to choose steps of the finite-difference grid. The
-rather obvious choice of the uniform step leads to a poor convergence. Also limits ...
+You probably noticed one inconsistency with difference operators that deserve extra attention.
+Namely, the x-axis difference is not well defined at the grid's boundaries.
 
-**X-grid step** is more tricky as it affects accuracy of the method. What we want is to draw more
-points around the spot price and less points at the edges of the x-grid.
+**At boundaries**, the x-axis difference operators are not well defined as values outside of the
+grid are missing. For example when calculating dV_0 according to the definition (xx), we need V[-1]
+value which is undefined.
+
+**The solution** is to account for the asymptotic behavior of the price function `V(t,x)` at
+boundaries of `s`, when `s -> 0` and `s -> +oo`.
+
+We know that `delta` is constant at boundaries, either 0 or 1, depending on the parity (PUT or
+CALL). However, more universal relation is that `gamma` is zero at boundaries. This gives the
+following relation:
 
 ## Finite-Difference Grid
+
+Finally, it's time to discuss how grid points are distributed of `x`- and `t`-axes. So far we just
+said that there are `N` and `M` points over the each axis, but said nothing about the limits and
+distribution of those points. In other words, what are the values `x[0]` / `x[M-1]` and gaps `dt[i]
+= t[i+1] - t[i]` and `dx[i] = x[i+1] - x[i]`
 
 **The t-Axis** is divided uniformly with a step dt = T / N between points. It doesn't seem to use
 some non-uniform step here, at least not something I observed in practice.
@@ -151,5 +205,6 @@ for (auto j = 0; j < xDim; ++j) {
 
 ## Conclusion
 
-Finite-Difference is a very powerful method since it's not limited to the problems with constant
-market factors or exotic contract features, like early exercise.
+Finite-Difference is a powerful numerical method, widely used by the quantitative finance
+practitioners. It can treat problems with exotic derivatives with non-constant coefficients and is
+easy to program, as we saw in this post.
