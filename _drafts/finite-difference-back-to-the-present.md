@@ -32,11 +32,7 @@ Studio and gives as smooth development experience as native VS project.
 which defines dynamics of the derivative price as a function of time and spot (or several spot
 variables in exotic cases).
 
-![Pricing PDE](/assets/img/fd-pde.png)
-
-![Pricing PDE](/assets/img/fd-pde-x.png)
-
-![Pricing PDE](/assets/img/fd-x.png)
+![Pricing PDE](/assets/img/fd-black-scholes.jpg)
 
 Below is a brief overview of two methods to derive this equation, in order of my personal
 preferences.
@@ -63,15 +59,13 @@ defined by x[i] = x[i-1] + dx_i and t[j] = t[j-1] + dt and labeled by i and j in
 
 Forward difference (backward difference):
 
-![Discretization](/assets/img/fd-dVdt.png)
-
 Central difference:
 
-![Discretization](/assets/img/fd-dVdx.png)
+![Discretization](/assets/img/fd-difference.png)
 
 Finite-Difference Equation(Discrete PDE) step-by-step generates solution from the initial values:
 
-![Pricing PDE](/assets/img/fd-pde2.png)
+![Pricing PDE](/assets/img/fd-difference-equation.png)
 
 **Crank-Nicolson** is probably on of the most popular discretization schemes for the Black-Scholes
 equation.
@@ -85,7 +79,7 @@ Implicit:
 
 - Crank-Nicolson
 
-![Pricing PDE](/assets/img/fd-schemes.png)
+![Finite-Difference Schemes](/assets/img/fd-crank-nicolson.png)
 
 Depending on how we expand the time derivative, we get forward or backward equation (?). These
 equations however are O(dt + dx^2) error. We can do better than that by introducing a continuos
@@ -129,7 +123,7 @@ some non-uniform step here, at least not something I observed in practice.
 
 **The x-Axis** is divided in a more tricky way. ...
 
-![Asinh Plot](/assets/img/asinh.png)
+![Asinh Plot](/assets/img/fd-asinh.png)
 
 ```cpp
 /// Init X-Grid
