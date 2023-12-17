@@ -4,40 +4,44 @@ author: Oleksandr Gituliar
 title: "Finite-Difference"
 ---
 
-- Option Chain for AAPL / AMD / TSLA
+<!-- - Option Chain for AAPL / AMD / TSLA -->
 
 **Pricing American options** is an open problem in the quantitative finance. Currently, it has no
-closed form solution similar to the Black-Scholes formula for European options. Therefore, various
-_numerical methods_ are used to solve this problem in practice. This post is about one of such
+closed form solution similar to the Black-Scholes formula for European options. Therefore, to solve
+this problem in practice various _numerical methods_ are used. This post is about one of such
 methods -- [Finite-Difference
 Method](https://en.wikipedia.org/wiki/Finite_difference_methods_for_option_pricing).
 
-I code in C++,
-however it should be accessible for people even with minimum C++ experience. It is more important to
-have basic knowledge of options and linear algebra, although not required either.
+We'll mainly focus on _practical aspects_. To deepen your understanding, follow links in the
+reference section below. But to start, you need no experience with the finite-difference method.
+This material should be accessible for people with minimum knowledge of numerical methods.
 
-You don't need to have hands-on experience with a finite-difference method. All necessary details
-will appear as we go. It's neither scarry nor difficult, believe me.
+<!-- You don't need to have hands-on experience with a finite-difference method. All necessary details
+will appear as we go. It's neither scarry nor difficult, believe me. -->
 
-**C++ is a great language** to implement a finite-difference pricer. My current setup is Ubuntu
-22.04 and Windows 11 with Visual Studio 2022. To compile cross-platform I use CMake, which is deeply
-integrated with Visual Studio and gives excellent development experience, similar to a native VS
-project.
+**C++ is a great language** to implement a finite-difference pricer. Some other languages are great
+too, but we have to make a choice.
 
-**Pricing for the Market** ...
+I recommend you my usual setup, which is Visual Studio for Windows. Occasionally, I also compile on
+Ubuntu Linux. This is possible thanks to CMake, which I use for all my projects.
+
+**Calibration.** For now we are solving a pricing problem, that is to find an option price given
+_implied volatility_ and contract details, like strike, maturity, etc. In practice, we need to find
+implied volatility from the option price available at the exchange. This is the inverse problem to
+pricing and is known as calibration. We'll focus on this in another post.
 
 ![AMD Option Chain on 2023-11-17 15:05](/assets/img/202311171505-AMD-retro.png)
 
-**Don't worry** if some concepts seem complicated at first. There is nothing difficult in what
+<!-- **Don't worry** if some concepts seem complicated at first. There is nothing difficult in what
 follows. Trust me. Give it another chance and consult references for more details and alternative
 perspective, which usually helps to connect the dots.
 
-Let's start!
+Let's start! -->
 
 ## Pricing Equation
 
-- Black-Scholes formula / equation
-- Black-Scholes family of equations
+<!-- - Black-Scholes formula / equation
+- Black-Scholes family of equations -->
 
 It's not a surprise that we start with the [Black-Scholes
 equation](https://en.wikipedia.org/wiki/Black%E2%80%93Scholes_equation), since it's this equation
@@ -71,22 +75,21 @@ Please, share in the comments you have different experience.
 
 ## Numerical Solution
 
-**The Black-Scholes equations** belong to the family of [diffusion equations](), which in general
-case have no closed-form solution. For now we should remember only that it's one of the easiest
-differential equations to solve numerically. Usually, apart from the
-[Finite-Difference method](https://en.wikipedia.org/wiki/Finite_difference_method), they are also treated
-with [Monte-Carlo]() or [Fourier transformation]() methods.
+**The Black-Scholes** equations belong to the family of [diffusion equations](), which in general
+case have no closed-form solution. Fortunately it's one of the easiest differential equations to
+solve numerically. Usually, apart from the [Finite-Difference
+method](https://en.wikipedia.org/wiki/Finite_difference_method), they are treated with
+[Monte-Carlo]() or [Fourier transformation]() methods.
 
-**The Unknown.** Let's start by formulating a problem we solve. Ultimately, we're looking for the
-**option price** as a function `V(t,s)`, for _arbitrary spot_ price `s` at a _fixed time_ `t=0`,
-where
+**The Problem** we solve, defined in mathematical terms, is to find the _option price_ function
+`V(t,s)` at a fixed time `t=0` for arbitrary spot price `s`. Where
 
-- `t` is the future time from today;
+- `t` is time from today;
 - `s` is the spot price of the option's underlying asset.
 
-Next, we continue with particular steps of the method:
+As we know what we're looking for, let's continue with particular steps of the method:
 
-**1) Finite Grid** is defined an `N x M` rectangular grid on the domain of independent variables
+**1) Finite Grid** is defined as an `N x M` rectangular grid on the domain of independent variables
 `(t,s)` defined as
 
 - `t[i] = t[i-1] + dt[i] ` for `i=0..N-1`
@@ -94,9 +97,9 @@ Next, we continue with particular steps of the method:
 
 This naturally leads to the following C++ definitions:
 
-**2) Difference Operator** is used to approximate continuous derivatives with a [finite
-difference](https://en.wikipedia.org/wiki/Finite_difference#Basic_types) operation on the grid that
-we have defined above.
+**2) Difference Operator** is used to approximate continuous derivatives in the original pricing
+equation. The [finite difference](https://en.wikipedia.org/wiki/Finite_difference#Basic_types)
+operation is defined on the `(t,x)` grid.
 
 Forward difference (backward difference):
 
@@ -118,18 +121,18 @@ only.
 of choice for the difference operators.
 
 **\delta_x and \delta_xx** operators are generally chosen according to the central difference
-definition above.
+definition.
 
 **\delta_t** operator, on the other hand, might be chosen as _Forward_ or _Backward_ difference,
 which lead to the [explicit
-scheme](https://en.wikipedia.org/wiki/Finite_difference_method#Explicit_method) solution. However,
-the numerical error is O(dt) + O(dx^2), which is not the best we can achieve.
+scheme](https://en.wikipedia.org/wiki/Finite_difference_method#Explicit_method) solution. In this
+case, the numerical error is O(dt) + O(dx^2), which is not the best we can achieve.
 
 **[Crank-Nicolson](https://en.wikipedia.org/wiki/Finite_difference_method#Crank%E2%80%93Nicolson_method)
-scheme** is an implicit scheme, which is a better alternative to the explicit scheme, because the
-numerical error is O(dt^2) + O(dx^2). It's slightly more complicated, since requires to solve a
-liner system of equation, however offers better convergence. In short, Crank-Nicolson scheme is is a
-fine mix of forward and backward schemes that reduces the numerical error.
+scheme**, an implicit scheme, is a better alternative to the explicit scheme, because the numerical
+error is O(dt^2) + O(dx^2), which offers much better accuracy. It's slightly more complicated, since
+requires to solve a liner system of equation. In other words, Crank-Nicolson scheme is is a fine mix
+of forward and backward schemes that reduces the numerical error.
 
 - Euler forward for `\theta = 1`
 - Euler backward for `\theta = 0`
