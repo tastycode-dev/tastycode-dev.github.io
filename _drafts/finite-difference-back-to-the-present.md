@@ -73,64 +73,60 @@ Please, share in the comments you have different experience.
 
 **The Black-Scholes** equations belong to the family of [diffusion equations](), which in general
 case have no closed-form solution. Fortunately it's one of the easiest differential equations to
-solve numerically. Usually, apart from the [Finite-Difference
-method](https://en.wikipedia.org/wiki/Finite_difference_method), they are treated with
+solve numerically, which usually, apart from the
+[Finite-Difference](https://en.wikipedia.org/wiki/Finite_difference_method), are treated with
 [Monte-Carlo]() or [Fourier transformation]() methods.
 
-**The Problem** we solve, defined in mathematical terms, is to find the _option price_ function
-`V(t,s)` at a fixed time `t=0` for arbitrary spot price `s`. Where
+**The Problem** we solve, as formulated in mathematical terms, is to find the _option price_
+function `V(t,s)` at a fixed time `t=0` (today) for arbitrary spot price `s`. Where
 
 - `t` is time from today;
-- `s` is the spot price of the option's underlying asset.
+- `s` is the spot price of the option's underlying asset. Although, it's more convenient to work
+  with `x = ln(s)` instead.
 
 As we know what we're looking for, let's continue with particular steps of the method:
 
 **1) Finite Grid** is defined as an `N x M` rectangular grid on the domain of independent variables
-`(t,s)` defined as
+`(t,s)` as
 
 - `t[i] = t[i-1] + dt[i] ` for `i=0..N-1`
 - `x[j] = x[j-1] + dx[j] ` for `j=0..M-1`.
 
 This naturally leads to the following C++ definitions:
 
-**2) Difference Operator** is used to approximate continuous derivatives in the original pricing
-equation. The [finite difference](https://en.wikipedia.org/wiki/Finite_difference#Basic_types)
-operation is defined on the `(t,x)` grid.
-
-Forward difference (backward difference):
-
-Central difference:
+**2) [Difference Operators](https://en.wikipedia.org/wiki/Finite_difference#Basic_types)** are used
+to approximate continuous derivatives in the original pricing equation. They are defined on the
+`(t,x)` grid as:
 
 ![Discretization](/assets/img/fd-difference.png)
 
 **3) Finite-Difference Equation**, a discrete version of the Black-Scholes equation, is derived from
-the pricing equation by replacing continuous derivatives with difference operators defined above.
+the pricing equation by replacing continuous derivatives with difference operators defined in Step 2.
 
 It's convenient to introduce the A operator, which contains difference operators over the x-axis
 only.
 
 ![Pricing PDE](/assets/img/fd-difference-equation.png)
 
-**4) Solution Scheme.** The equation above is not defined completely yet, as we still have freedom
-of choice for the difference operators.
+**4) Solution Scheme.** The above equation isn't completely defined yet, as we can expand
+**\delta_t** operator in several ways. (**\delta_x and \delta_xx** operators are generally chosen
+according to the central difference definition.)
 
-**\delta_x and \delta_xx** operators are generally chosen according to the central difference
-definition.
-
-**\delta_t** operator, on the other hand, might be chosen as _Forward_ or _Backward_ difference,
-which lead to the [explicit
-scheme](https://en.wikipedia.org/wiki/Finite_difference_method#Explicit_method) solution. In this
-case, the numerical error is O(dt) + O(dx^2), which is not the best we can achieve.
+**\delta_t** operator might be chosen as _Forward_ or _Backward_ difference, which lead to the
+[explicit scheme](https://en.wikipedia.org/wiki/Finite_difference_method#Explicit_method) solution.
+In this case, the numerical error is O(dt) + O(dx^2), which is not the best we can achieve.
 
 **[Crank-Nicolson](https://en.wikipedia.org/wiki/Finite_difference_method#Crank%E2%80%93Nicolson_method)
-scheme**, an implicit scheme, is a better alternative to the explicit scheme, because the numerical
-error is O(dt^2) + O(dx^2), which offers much better accuracy. It's slightly more complicated, since
-requires to solve a liner system of equation. In other words, Crank-Nicolson scheme is is a fine mix
-of forward and backward schemes that reduces the numerical error.
+scheme**, an implicit scheme, is a better alternative to the explicit scheme. It's slightly more
+complicated, since requires to solve a liner system of equations, however the numerical error is
+O(dt^2) + O(dx^2), which is much better than for the explicit schemes.
 
-- Euler forward for `\theta = 1`
-- Euler backward for `\theta = 0`
-- Crank-Nicolson for `\theta = 1/2`
+You can think of the Crank-Nicolson scheme as a continuos mix of forward and backward schemes tuned
+by \theta parameter, so that
+
+- `\theta = 1` is Euler forward scheme
+- `\theta = 0` is Euler backward
+- `\theta = 1/2` is Crank-Nicolson scheme
 
 ![Finite-Difference Schemes](/assets/img/fd-crank-nicolson.png)
 
@@ -148,9 +144,16 @@ exercise. If continue like that we will get a European option price. For the Ame
 should ensure that option price is not less than its intrinsic value, otherwise we'll get an
 arbitrage situation when one can buy an option for the lower price than its exercise value.
 
-In other words:
-
 ![Early Exercise Condition](/assets/img/fd-early-exercise.png)
+
+In other words, American option's value is never less than its payoff, which is the _initial
+condition_ for the difference equation:
+
+```cpp
+for (auto xi = 0; xi < xDim; ++xi) {
+    v[xi] = std::max(v[xi], vInit[xi]);
+}
+```
 
 ## Boundary Conditions
 
