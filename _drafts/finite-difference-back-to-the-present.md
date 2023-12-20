@@ -6,93 +6,98 @@ title: "Finite-Difference"
 
 <!-- - Option Chain for AAPL / AMD / TSLA -->
 
-**Pricing American options** is an open problem in the quantitative finance. Currently, it has no
-closed form solution similar to the Black-Scholes formula for European options. Therefore, to solve
-this problem in practice various _numerical methods_ are used. This post is about one of such
-methods -- [Finite-Difference
+In [my previous post]() I discussed performance of the finite-difference algorithm for pricing
+American options on CPU vs GPU. Since then, people have asked to elaborate on the pricing algorithm
+itself. Hence, this post is dedicated to the [Finite-Difference
 Method](https://en.wikipedia.org/wiki/Finite_difference_methods_for_option_pricing).
 
-We'll mainly focus on _practical aspects_. To deepen your understanding, follow links in the
-reference section below. But to start, you need no experience with the finite-difference method.
-This material should be accessible for people with minimum knowledge of numerical methods.
+**C++ is a great language** to implement a finite-difference pricer on CPU and GPU. You'll find full
+source code from the previous post in [gituliar/kwinto-cuda]() on GitHub. Here, I'll discuss some of
+its key parts.
+
+For C++ development, I recommend my favorite setup: Visual Studio for Windows + CMake + vcpkg.
+Occasionally, I also compile on Ubuntu Linux with GCC and Clang, which is possible since I use CMake
+in my projects.
+
+**Pricing American options** is an open problem in the quantitative finance. It has no closed form
+solution similar to the Black-Scholes formula for European options. Therefore, to solve this problem
+in practice various _numerical methods_ are used.
+
+To continue, you don't need deep knowledge of the finite-difference method. This material should be
+accessible for people with basic understanding of C++ and numerical methods at the undergraduate level.
 
 <!-- You don't need to have hands-on experience with a finite-difference method. All necessary details
 will appear as we go. It's neither scarry nor difficult, believe me. -->
 
-**C++ is a great language** to implement a finite-difference pricer. Some other languages are great
-too, but we have to make a choice.
+**Calibration.** For now we solve a pricing problem only, that is to find an option price given
+_implied volatility_ and option parameters, like strike, expiry, etc. In practice, the implied
+volatility is unknown and should be determined given the option price from the exchange. This is
+known as _calibration_ and is the inverse problem to pricing, which we'll focus on in another post.
 
-I recommend you my usual setup, which is Visual Studio for Windows. Occasionally, I also compile on
-Ubuntu Linux. This is possible thanks to CMake, which I use for all my projects.
-
-**Calibration.** For now we are solving a pricing problem, that is to find an option price given
-_implied volatility_ and contract details, like strike, maturity, etc. In practice, we need to find
-implied volatility from the option price available at the exchange. This is the inverse problem to
-pricing and is known as calibration. We'll focus on this in another post.
+For example, below is a chain of option prices and already calibrated implied
+volatilities for AMD as of 2023-11-17 15:05:
 
 ![AMD Option Chain on 2023-11-17 15:05](/assets/img/202311171505-AMD-retro.png)
 
-<!-- **Don't worry** if some concepts seem complicated at first. There is nothing difficult in what
-follows. Trust me. Give it another chance and consult references for more details and alternative
-perspective, which usually helps to connect the dots.
-
-Let's start! -->
-
 ## Pricing Equation
 
-<!-- - Black-Scholes formula / equation
-- Black-Scholes family of equations -->
+**American option's price** is defined as a solution of the [Black-Scholes
+equation](https://en.wikipedia.org/wiki/Black%E2%80%93Scholes_equation). In fact, it's the same
+equation that results into a famous [Black-Scholes formula]() for European option. However, for
+American option we should impose an extra condition to account for the _early exercise_, which we
+discuss down below. It's this early-exercise condition that makes the original equation so difficult
+that we have no option, but to solve it numerically.
 
-It's not a surprise that we start with the [Black-Scholes
-equation](https://en.wikipedia.org/wiki/Black%E2%80%93Scholes_equation), since it's this equation
-that we should solve to find the price of the American option. I'm not going to dwell much on its
-foundation and properties here, however there is one thing I'd like to stress.
+**The Black-Scholes equation** is that just a particular example of the pricing differential
+equation. In general, we can define similar differential equations for various types and flavours of
+options and other derivatives, which can be treated with the same method. This versatility is what
+makes the finite-difference so popular among quants and widely used in financial institutions.
 
-**The European Option's** price, defined by the famous [Black-Scholes formula](), is just a
-particular example of the Black-Scholes equation. In general, we can define similar pricing
-equations for many other derivative types and flavours.
+**The pricing equation** is usually derived using [Delta Hedging]() argument, which is an intuitive
+and powerful approach to derive pricing equations, not only for vanilla options, but for exotic
+multi-asset derivatives as well. See ... for more details.
 
- <!-- Equations of this family have very similar
-mathematical structure and can be solved using the finite-difference method we discuss here. This
-makes it a very robust method for pricing derivatives that is worth to be familiar with. -->
-
-**The pricing equation** is usually derived using one of the following methods (in order of my
-personal preference):
-
-- [Delta Hedging]() argument is a very intuitive yet powerful way to derive a pricing equation, not
-  only for vanilla options, but for more exotic multi-asset derivatives as well. See ... for more
-  details.
-
-- [Feynman-Kac Theorem]() is very theoretical and I don't find it useful in practice.
-
-Please, share in the comments you have different experience.
+In practice, it's more convenient to change variables to `x = \ln(s)` which leads to the following
+equation:
 
 ![Pricing PDE](/assets/img/fd-black-scholes.jpg)
 
 ## Numerical Solution
 
-**The Black-Scholes** equations belong to the family of [diffusion equations](), which in general
+**The Black-Scholes** equation belongs to the family of [diffusion equations](), which in general
 case have no closed-form solution. Fortunately it's one of the easiest differential equations to
-solve numerically, which usually, apart from the
-[Finite-Difference](https://en.wikipedia.org/wiki/Finite_difference_method), are treated with
-[Monte-Carlo]() or [Fourier transformation]() methods.
+solve numerically, which apart from the
+[Finite-Difference](https://en.wikipedia.org/wiki/Finite_difference_method), are usually treated
+with [Monte-Carlo]() or [Fourier transformation]() methods.
 
-**The Problem** we solve, as formulated in mathematical terms, is to find the _option price_
-function `V(t,s)` at a fixed time `t=0` (today) for arbitrary spot price `s`. Where
+**The Solution.** Let's be more specific about the solution we are looking for. Our goal is to find
+the option price _function_ `V(t,s)` at a fixed time `t=0` (today) for arbitrary spot price `s`.
+Here
 
 - `t` is time from today;
 - `s` is the spot price of the option's underlying asset. Although, it's more convenient to work
   with `x = ln(s)` instead.
 
-As we know what we're looking for, let's continue with particular steps of the method:
+Let's continue with concrete steps of the finite-difference method:
 
-**1) Finite Grid** is defined as an `N x M` rectangular grid on the domain of independent variables
-`(t,s)` as
+**1) Finite Grid.** We define a _rectangular grid_ on the domain of independent variables `(t,s)`
+which take
 
 - `t[i] = t[i-1] + dt[i] ` for `i=0..N-1`
 - `x[j] = x[j-1] + dx[j] ` for `j=0..M-1`.
 
 This naturally leads to the following C++ definitions:
+
+```cpp
+#define N 512
+#define M 1024
+
+auto xDim = 512;
+auto tDim = 512;
+
+std::vector<f64> x;
+std::vector<f64> t;
+```
 
 **2) [Difference Operators](https://en.wikipedia.org/wiki/Finite_difference#Basic_types)** are used
 to approximate continuous derivatives in the original pricing equation. They are defined on the
@@ -191,15 +196,15 @@ some non-uniform step here, at least not something I observed in practice.
 const f64 density = 0.1;
 const f64 scale = 10;
 
-const f64 xMid = log(asset.s);
-const f64 xMin = xMid - scale * asset.z * sqrt(asset.t);
-const f64 xMax = xMid + scale * asset.z * sqrt(asset.t);
+const f64 xMid = log(s);
+const f64 xMin = xMid - scale * z * sqrt(t);
+const f64 xMax = xMid + scale * z * sqrt(t);
 
 const f64 yMin = std::asinh((xMin - xMid) / density);
 const f64 yMax = std::asinh((xMax - xMid) / density);
 
 const f64 dy = 1. / (xDim - 1);
-for (auto j = 0; j < xDim; ++j) {
+for (auto j = 0; j < xDim; j++) {
     const f64 y = j * dy;
     xGrid(j) = xMid + density * std::sinh(yMin * (1.0 - y) + yMax * y);
 }
